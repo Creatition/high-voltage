@@ -90,12 +90,67 @@ This means:
 
 ## Time machine hub
 
-Between eras, you return to a small overworld — the inside of the time machine. This is your shop, your upgrade space, and your social hub.
+Between eras, you return to a small overworld — the inside of the time machine. This is your shop, your upgrade space, your social hub, and the home of the game's narrator (see next section).
 
 - **Workbench:** spend cash on permanent player upgrades.
 - **Era selection console:** choose your next destination.
 - **NPC roster:** unlock characters from each era who give passive run buffs (a tame raptor, a wandering sheriff, an alien mechanic).
+- **Wardrobe:** swap between unlocked player characters/skins (see Character System below).
 - **Customization:** cockpit cosmetics, weapon skins, gameplay modifiers.
+
+## The narrating time machine
+
+The time machine itself is a character — a sarcastic, world-weary AI voice that talks to you between rooms, comments on your build, narrates your boss fights, and slowly reveals lore over the course of the game. Cheap and high-leverage: text + a portrait/voice line carries enormous personality.
+
+**References:** Hades (Zagreus's interactions with the house), Bastion (the narrator), Pyre (the Reader), Stanley Parable (the Narrator). Each used a talking presence to turn a mechanically simple framing into a memorable game.
+
+The AI should:
+- Comment on the player's gun build ("Going for a homing-explosive setup again? Bold.")
+- React to which era the player picks next ("Egypt? Bring sunscreen.")
+- Hint at the boss's motives across the game in a slow drip.
+- Occasionally bicker with the player character (especially if the protagonist is named/voiced).
+- Have a name. (TBD — open question.)
+
+## Character system
+
+The player can unlock and swap between multiple playable characters. Characters are **cosmetic at first, with potential for light gameplay variation** later (e.g., one character starts with +1 HP but -1 damage, another starts with a reroll token).
+
+- All characters share the Chrono-Pistol upgrade system — no character-locked weapons.
+- Unlock conditions: complete a full run with the previous character, beat specific bosses, find hidden NPCs, achieve specific milestones (clear an era without taking damage, etc.).
+- Skins can be era-themed (a cavewoman, a pharaoh, a gunslinger, a cyborg) — naturally feeds the time-travel motif.
+- Roster grows the game without bloating the systems work.
+
+## Multiplayer roadmap
+
+Multiplayer is a **post-v1 expansion**, not in the launch scope. Solo dev + multiplayer at launch is a project-killer; building it on a stable single-player foundation is the safe path.
+
+### Phase 1 — v1.0 launch: single-player only
+The campaign, all 5 eras, full gun system, narrating time machine, character roster. This alone is the bulk of the project. Ship this first.
+
+### Phase 2 — v1.x: local co-op (couch)
+Same-screen co-op for 2–4 players with controllers. No netcode, minimal complexity. Strong Steam selling point. Reference: Brotato shipped this way.
+
+### Phase 3 — v2.0: online co-op + PvP
+Both online modes use **GodotSteam** (Godot plugin wrapping Steamworks) for matchmaking, lobbies, and P2P networking. No dedicated servers needed → no ongoing infrastructure cost.
+
+**Online co-op campaign:** 2–4 players run the same campaign together. Loot and currency shared or instanced (design decision TBD).
+
+**PvP mode — "Time Trials" (Rounds-inspired):** A separate mode from the campaign menu.
+- 2–4 players, small symmetric arenas (one arena per era as the map pool).
+- Last player standing wins the round.
+- Best-of-X format for the match.
+- **The Rounds-style hook:** after each round, the player(s) who lost get to pick from 3 random gun upgrade cards. Winners get nothing. This rubber-banding keeps matches close and competitive.
+- The Chrono-Pistol's upgrade system maps directly onto this — same cards, same logic, just a different game mode.
+- Cosmetic-only character roster carries over from the campaign.
+
+### Why GodotSteam over rolling your own server
+- Zero server cost (no ongoing infrastructure).
+- Steam handles lobbies, matchmaking, friend invites, NAT punchthrough.
+- One platform target (Steam-only multiplayer is a fine trade for a solo dev — most indie games do this).
+- Godot 4's high-level MultiplayerAPI works on top of it cleanly.
+
+### Why PvP as a separate mode, not integrated
+The campaign is procedural and asymmetric (different runs, different builds). PvP needs balance, symmetry, and low latency. They share the gun engine but want opposite design constraints. Treating them as separate modes lets each shine.
 
 ## Additional ideas worth exploring
 
@@ -106,7 +161,7 @@ These came up after the initial concept — keeping them here so they don't get 
 3. **Recurring enemy archetypes.** The "brute" archetype recurs across eras — caveman → sphinx guard → gunslinger → riot cop → mech. Mastering an archetype carries skill across the whole game.
 4. **Hidden 6th era (NG+).** Unlock after beating the game once. Could be Atlantis, far-future apocalypse, or a true "outside time" void. Reveals the boss's true origin.
 5. **Daily run / seeded leaderboard.** Gungeon does this. Cheap to add, big retention boost.
-6. **Co-op mode.** Two players, each can pursue different eras and meet at boss fights. Probably v2 scope.
+6. **Split-path co-op.** During online co-op, allow two players to pursue different eras simultaneously and meet at boss fights. Adds strategic choice but doubles design complexity — defer to v2.x.
 7. **Boss reveals through a "field journal".** The player character keeps a log that fills in lore as you progress. Doubles as a tutorial reference for status effects/enemies.
 8. **Era-specific companion pets.** Each unlock-able after clearing that era — a baby raptor, a scarab swarm familiar, a robot dog, etc. Combat or utility role.
 9. **Achievements tied to gun builds.** "Beat the game with a homing-shotgun build", "Beat the game with only explosive rounds", etc. Drives experimentation.
@@ -125,29 +180,45 @@ Why pixel art over vector for this project:
 
 ### Tooling
 
-| Purpose | Tool | Notes |
-|---|---|---|
-| Sprite art + animation | **Aseprite** | $20 one-time, industry standard for pixel art |
-| Level layout | **LDtk** or **Tiled** | Both free, both have Godot importers |
-| SFX | **ChipTone**, **sfxr/Bfxr** | Free, browser-based |
-| Music | **BeepBox**, **LMMS** | Free; BeepBox for chiptune-leaning, LMMS for fuller tracks |
-| Audio editing | **Audacity** | Free |
-| Version control | **Git + GitHub** | Already in use (Creatition/high-voltage) |
+| Purpose | Tool | Link | Notes |
+|---|---|---|---|
+| Sprite art + animation | **Aseprite** | https://www.aseprite.org/ | $20 one-time, industry standard for pixel art |
+| Level layout | **LDtk** | https://ldtk.io/ | Free, modern, made by Dead Cells dev — recommended |
+| Level layout (alt) | **Tiled** | https://www.mapeditor.org/ | Free, more mature, also great |
+| SFX | **ChipTone** | https://sfbgames.itch.io/chiptone | Free, browser-based, retro sfx |
+| Music | **BeepBox** | https://www.beepbox.co/ | Free, browser-based chiptune composer |
+| Audio editing | **Audacity** | https://www.audacityteam.org/ | Free, multi-platform |
+| Multiplayer networking | **GodotSteam** | https://godotsteam.com/ | Steamworks wrapper for Godot — added in Phase 3 |
+| Version control | **Git + GitHub** | https://github.com/Creatition/high-voltage | Already in use |
+
+### Art specifications
+
+- **Sprite resolution:** 32×32 base (player + enemies). Larger sprites for bosses (64×64 or 96×96). UI/HUD at native screen resolution.
+- **Color depth:** limited palette per era (16–32 colors each) for consistency and stylization.
+- **Animation framerate:** 8–12 fps for most actions, snappier (60 fps engine refresh, but discrete keyframes).
 
 ## Open questions
 
-- Player character name + backstory, or blank-slate avatar?
-- Is the time machine itself a character (sentient AI, mysterious voice)?
+- What's the time machine AI's name and personality voice?
+- Default starter character — does it have a name, or is the first character a blank-slate "Recruit"?
 - What's the boss's motivation — chaos, power, vengeance, accident?
-- Pixel art resolution target: 32×32 sprites (Brotato chunky), 16×16 (Nuclear Throne tight), or 48×48 (Gungeon detailed)?
+- Online co-op loot: shared pool or instanced per player?
+- Music direction — chiptune, synth-orchestral hybrid (Hades-style), or era-distinct genres (saloon piano in West, synthwave in Future, etc.)?
 
-## Decisions locked in (2026-05-17)
+## Decisions locked in
+
+**2026-05-17:**
 
 - **Title:** Timeshot
 - **Engine:** Godot 4.x
 - **Art style:** stylized cartoony pixel art
+- **Sprite resolution:** 32×32 base (larger for bosses)
 - **Team:** solo dev
-- **Boss design:** one antagonist, evolving era-fused forms, steals upgrades for final fight
+- **Boss design:** one antagonist with evolving era-fused forms; steals upgrades for final fight
+- **Narrator:** sarcastic AI voice of the time machine (Hades/Bastion-style)
+- **Character system:** unlockable swappable characters/skins, all sharing the Chrono-Pistol system
+- **Multiplayer roadmap:** v1.0 single-player → v1.x local co-op → v2.0 online co-op + PvP Rounds-style mode (via GodotSteam)
+- **Time paradox mechanic:** confirmed, actions in one era ripple into others
 
 ---
 
