@@ -78,6 +78,47 @@ This means:
 - The final boss's loadout is a horror-mirror of your specific run — every player's final fight is different.
 - On defeat, each mid-era boss form also drops a unique era-themed upgrade card as compensation.
 
+## Secret rooms
+
+Every dungeon floor contains **at least one hidden room** that the player must discover. Secret rooms are a high-leverage feature: they reward exploration, give skilled players a power edge, and create memorable individual run moments without adding much systems complexity.
+
+### Discovery methods
+- **Destructible walls.** Certain walls look subtly different (cracks, a discoloration, a hairline crack on the minimap) and break when shot.
+- **Pressure plates and timed triggers.** Step on a specific tile, or clear an arena fast enough, and a wall opens elsewhere.
+- **Map-corner heuristics.** Like Binding of Isaac, a secret room is more likely to be placed where 2–4 existing rooms touch a blank space on the map. Observant players learn to scan the minimap.
+- **Era-specific cues.** Each era has its own theming: a loose hieroglyph in Egypt, a creaky floorboard in the saloon, a flickering hologram panel in the Future.
+
+### Contents
+Secret rooms are weighted-random pulls from a content pool:
+- **Black-market shop.** Higher-tier gun upgrades than the normal shop, often at a premium or with a tradeoff (sacrifice HP to afford, etc.).
+- **Free upgrade.** A single upgrade card, no payment required.
+- **Currency hoard.** A pile of the era's currency, no fight required.
+- **Challenge room.** An arena that locks the doors; survive waves for a guaranteed rare upgrade.
+- **Lore room.** A journal entry, a glimpse of the boss, an empty cell with a clue. (Cheap to build, big payoff.)
+- **NPC encounters.** Era-specific characters that can become hub roster unlocks (a captured raptor, a wandering sheriff, an alien defector).
+
+### Why this works
+- Adds replayability for free — players never know which type of secret room they'll get.
+- Creates word-of-mouth moments ("Wait, you can break THAT wall?").
+- Doubles as a content delivery mechanism for rare items and lore without bloating the main loop.
+
+In the prototype slice, even **one secret room per floor** with one or two content pool entries is enough to prove the mechanic feels good.
+
+## Controller support
+
+Target full controller parity at launch.
+
+| Controller | Support status |
+|---|---|
+| **Xbox One / Series** | Native (Godot 4 generic gamepad). Full feature support. |
+| **DualSense (PS5) — basic** | Native (sticks, buttons, standard rumble). Steam Input handles button-prompt swap (△ □ × ○). |
+| **DualSense — adaptive triggers + haptic feedback** | **Post-launch polish.** Requires Steam Input API integration or community plugin. Not native to Godot 4. |
+| **Switch Pro** | Native, treated as generic gamepad. |
+| **Generic XInput / DirectInput** | Native. |
+
+### Architecture rule
+Bind all gameplay to abstract **input actions** (e.g. `shoot`, `dodge`, `interact`), never to specific button codes. Godot's `Input` API handles device detection and prompt swapping. This makes adding DualSense haptics later a pure additive layer, not a refactor.
+
 ## Era-specific mechanics
 
 | Era | Signature mechanics | Status effects | Hazards |
@@ -303,6 +344,8 @@ Why pixel art over vector for this project:
 - **Character system:** unlockable swappable characters/skins, all sharing the Chrono-Pistol system
 - **Multiplayer roadmap:** v1.0 ships with solo + local couch co-op + Steam Remote Play Together (acts as online co-op). v1.x post-launch adds **Showdown** (PvP Rounds-style mode) with real netcode via GodotSteam.
 - **Time paradox mechanic:** confirmed, actions in one era ripple into others
+- **Secret rooms:** every floor has at least one hidden room (destructible walls + map heuristics); content pool includes black-market shops, free upgrades, currency, challenge rooms, lore
+- **Controller support:** full Xbox + DualSense (basic) at launch via abstract input actions; DualSense haptics/adaptive triggers deferred to post-launch polish
 
 ---
 

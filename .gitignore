@@ -26,3 +26,26 @@ venv/
 dist/
 build/
 *.log
+
+# --- Godot 4 ---
+# Godot generates this on first project import; never commit.
+.godot/
+
+# Legacy Godot 3 import cache (in case of accidental open in older versions)
+.import/
+
+# Auto-generated translation binaries
+*.translation
+
+# Godot Mono / .NET specific
+.mono/
+data_*/
+mono_crash.*.json
+
+# Exported builds (use a separate exports/ folder if you keep builds in-repo)
+*.pck
+*.exe.config
+
+# Aseprite working backups
+*.ase.bak
+*.aseprite-backup
