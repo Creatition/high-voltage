@@ -30,6 +30,10 @@ EraRegistry="*res://scripts/autoload/era_registry.gd"
 CharacterRegistry="*res://scripts/autoload/character_registry.gd"
 SaveSystem="*res://scripts/autoload/save_system.gd"
 Juice="*res://scripts/autoload/juice.gd"
+DungeonGenerator="*res://scripts/autoload/dungeon_generator.gd"
+DungeonRunner="*res://scripts/autoload/dungeon_runner.gd"
+DungeonThemeRegistry="*res://scripts/autoload/dungeon_theme_registry.gd"
+DungeonTemplateLibrary="*res://scripts/autoload/dungeon_template_library.gd"
 
 [display]
 
