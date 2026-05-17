@@ -12,6 +12,9 @@ class_name EnemyBase
 @export var shard_scene: PackedScene = preload("res://scenes/pickups/time_shard.tscn")
 @export var flash_color: Color = Color(1.5, 1.5, 1.5, 1.0)
 @export var flash_duration: float = 0.08
+## Visual scale for the enemy sprite. Bumped slightly so enemies read at the
+## new wider camera zoom without enlarging their collision shapes.
+@export var sprite_scale: float = 1.2
 
 @onready var sprite: Sprite2D = get_node_or_null("Sprite2D") as Sprite2D
 @onready var health: HealthComponent = get_node_or_null("HealthComponent") as HealthComponent
@@ -20,6 +23,8 @@ var _flash_tween: Tween
 
 
 func _ready() -> void:
+	if sprite != null and sprite_scale != 1.0:
+		sprite.scale = Vector2(sprite_scale, sprite_scale)
 	if health != null:
 		health.damaged.connect(_on_damaged)
 		health.died.connect(_on_died)

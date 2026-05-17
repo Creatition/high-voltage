@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://timeshot_present_room_01"]
+[gd_scene load_steps=13 format=3 uid="uid://timeshot_present_room_01"]
 
 [ext_resource type="Script" path="res://scenes/rooms/room.gd" id="1_room"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -7,6 +7,9 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hud"]
 [ext_resource type="PackedScene" path="res://scenes/rooms/door.tscn" id="6_door"]
 [ext_resource type="Script" path="res://scenes/rooms/wave_spawner.gd" id="7_spawner"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/swarmer.tscn" id="8_swarmer"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/bomber.tscn" id="9_bomber"]
+[ext_resource type="PackedScene" path="res://scenes/enemies/sniper.tscn" id="10_sniper"]
 
 [sub_resource type="RectangleShape2D" id="shape_wall_h"]
 size = Vector2(1200, 16)
@@ -90,10 +93,10 @@ position = Vector2(220, 540)
 script = ExtResource("7_spawner")
 waves = [{
 "delay": 0.6,
-"spawns": [{"scene": ExtResource("3_chaser"), "marker": "M1"}, {"scene": ExtResource("3_chaser"), "marker": "M2"}, {"scene": ExtResource("4_shooter"), "marker": "M3"}]
+"spawns": [{"scene": ExtResource("3_chaser"), "marker": "M1"}, {"scene": ExtResource("8_swarmer"), "marker": "M2"}, {"scene": ExtResource("8_swarmer"), "marker": "M3"}, {"scene": ExtResource("10_sniper"), "marker": "M4"}]
 }, {
 "delay": 4.0,
-"spawns": [{"scene": ExtResource("3_chaser"), "marker": "M4"}, {"scene": ExtResource("4_shooter"), "marker": "M5"}]
+"spawns": [{"scene": ExtResource("9_bomber"), "marker": "M4"}, {"scene": ExtResource("4_shooter"), "marker": "M5"}, {"scene": ExtResource("8_swarmer"), "marker": "M1"}]
 }]
 
 [node name="M1" type="Marker2D" parent="WaveSpawner"]

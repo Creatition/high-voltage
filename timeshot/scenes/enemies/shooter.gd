@@ -2,13 +2,13 @@ extends EnemyBase
 class_name ShooterEnemy
 ## Maintains a preferred distance from the player and fires enemy projectiles.
 
-@export var move_speed: float = 90.0
-@export var acceleration: float = 600.0
-@export var preferred_distance: float = 260.0
+@export var move_speed: float = 75.0
+@export var acceleration: float = 500.0
+@export var preferred_distance: float = 280.0
 @export var distance_tolerance: float = 40.0
-@export var aggro_radius: float = 700.0
+@export var aggro_radius: float = 800.0
 
-@export var shoot_cooldown: float = 1.1
+@export var shoot_cooldown: float = 1.4
 @export var projectile_scene: PackedScene
 @export var first_shot_delay: float = 0.6
 

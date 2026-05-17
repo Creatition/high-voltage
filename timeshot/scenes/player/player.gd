@@ -2,16 +2,21 @@ extends CharacterBody2D
 ## Cas — the starter protagonist.
 ## Top-down twin-stick movement with dodge roll, aim, and shoot.
 
-@export var move_speed: float = 220.0
-@export var acceleration: float = 1800.0
-@export var friction: float = 1600.0
+@export var move_speed: float = 185.0
+@export var acceleration: float = 1500.0
+@export var friction: float = 1400.0
 
-@export var dodge_speed: float = 520.0
+@export var dodge_speed: float = 440.0
 @export var dodge_duration: float = 0.25
 @export var dodge_cooldown: float = 0.6
 
-@export var shoot_cooldown: float = 0.18
+@export var shoot_cooldown: float = 0.20
 @export var projectile_scene: PackedScene
+
+## Visual scale applied to the sprite at _ready. Keeps the collision shape
+## (small, snappy hitbox) decoupled from the rendered character size, so we
+## can zoom the camera out and still read the character at a comfortable size.
+@export var sprite_scale: float = 1.25
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var muzzle: Marker2D = $Muzzle
@@ -45,6 +50,8 @@ var _crit_mult: float = 2.0
 
 func _ready() -> void:
 	add_to_group("players")
+	if sprite != null:
+		sprite.scale = Vector2(sprite_scale, sprite_scale)
 	_apply_character_overrides()
 	_apply_permanent_overrides()
 	_apply_starter_upgrade()

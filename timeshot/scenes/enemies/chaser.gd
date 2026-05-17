@@ -3,9 +3,9 @@ class_name ChaserEnemy
 ## Walks straight at the nearest player. Deals contact damage via a HitboxComponent.
 ## Designed for the prototype Present era.
 
-@export var move_speed: float = 130.0
-@export var acceleration: float = 700.0
-@export var aggro_radius: float = 800.0
+@export var move_speed: float = 110.0
+@export var acceleration: float = 600.0
+@export var aggro_radius: float = 900.0
 
 var _target: Node2D = null
 var _retarget_timer: float = 0.0

@@ -10,61 +10,64 @@ class_name EnemyTable
 ## them to actual PackedScenes from res://scenes/enemies/.
 
 static func enemy_pools(era: String) -> Dictionary:
+	# Day 22 — the swarmer/bomber/sniper trio joins every era's roster so
+	# fights have more variety and force-mixed counter-play (kite the bomber,
+	# break line-of-sight on the sniper, run from swarms).
 	match era:
 		"present":
 			return {
-				"grunts":   ["drone", "hacker"],
-				"specials": ["hacker"],
-				"elites":   ["hacker"],
+				"grunts":   ["drone", "hacker", "swarmer"],
+				"specials": ["hacker", "bomber"],
+				"elites":   ["hacker", "sniper"],
 				"traps":    ["pressure_plate", "dart_shooter"],
 			}
 		"prehistoric":
 			return {
-				"grunts":   ["raptor"],
-				"specials": ["pterodactyl"],
+				"grunts":   ["raptor", "swarmer"],
+				"specials": ["pterodactyl", "bomber"],
 				"elites":   ["pterodactyl"],
 				"traps":    ["spike_pit"],
 			}
 		"medieval":
 			return {
-				"grunts":   ["knight"],
-				"specials": ["archer"],
-				"elites":   ["archer"],
+				"grunts":   ["knight", "swarmer"],
+				"specials": ["archer", "bomber"],
+				"elites":   ["archer", "sniper"],
 				"traps":    ["pressure_plate"],
 			}
 		"future", "cyberpunk":
 			return {
-				"grunts":   ["drone", "hacker"],
-				"specials": ["hacker"],
-				"elites":   ["hacker"],
+				"grunts":   ["drone", "hacker", "swarmer"],
+				"specials": ["hacker", "bomber"],
+				"elites":   ["hacker", "sniper"],
 				"traps":    ["dart_shooter"],
 			}
 		"alien":
 			return {
-				"grunts":   ["alien_grunt"],
-				"specials": ["alien_sentry"],
-				"elites":   ["alien_sentry"],
+				"grunts":   ["alien_grunt", "swarmer"],
+				"specials": ["alien_sentry", "bomber"],
+				"elites":   ["alien_sentry", "sniper"],
 				"traps":    ["spike_pit"],
 			}
 		"aztec":
 			return {
-				"grunts":   ["chaser"],
-				"specials": ["shooter"],
-				"elites":   ["shooter"],
+				"grunts":   ["chaser", "swarmer"],
+				"specials": ["shooter", "bomber"],
+				"elites":   ["shooter", "sniper"],
 				"traps":    ["dart_shooter", "spike_pit"],
 			}
 		"egypt":
 			return {
-				"grunts":   ["chaser"],
-				"specials": ["shooter"],
-				"elites":   ["shooter"],
+				"grunts":   ["chaser", "swarmer"],
+				"specials": ["shooter", "bomber"],
+				"elites":   ["shooter", "sniper"],
 				"traps":    ["dart_shooter", "spike_pit"],
 			}
 		_:
 			return {
-				"grunts":   ["chaser"],
-				"specials": ["shooter"],
-				"elites":   ["shooter"],
+				"grunts":   ["chaser", "swarmer"],
+				"specials": ["shooter", "bomber"],
+				"elites":   ["shooter", "sniper"],
 				"traps":    ["pressure_plate"],
 			}
 
