@@ -29,9 +29,17 @@ extends Node
 # to the legacy linear queue rather than booting the player into a no-boss
 # dungeon.
 @export var max_regen_attempts: int = 4
+# Day 5 (Gungeon pass) — flip on to use the multi-cell RoomShape pipeline
+# (room_shape.gd + gungeon_layout_builder.gd + gungeon_corridor_carver.gd)
+# instead of the legacy BSP placement. The new pipeline produces variable-
+# size rooms and stub corridors to match the Enter-the-Gungeon reference.
+@export var use_gungeon_layout: bool = true
 
 # --- Active layout, owned by the generator while the era is being played ---
 var current_layout: DungeonLayout = null
+# Side data from the gungeon builder — read by GungeonMinimap. Empty when
+# use_gungeon_layout is false or when generation fell back to BSP.
+var current_gungeon_data: Dictionary = {}
 
 
 func generate(era_id: String, seed_value: int = 0) -> DungeonLayout:
@@ -45,7 +53,11 @@ func generate(era_id: String, seed_value: int = 0) -> DungeonLayout:
 		var seed_for_attempt: int = seed_value if seed_value != 0 else 0
 		layout = DungeonLayout.new(era_id, seed_for_attempt)
 		layout.grid_size = grid_size
-		_place_rooms(layout)
+		current_gungeon_data = {}
+		if use_gungeon_layout:
+			_place_rooms_gungeon(layout)
+		else:
+			_place_rooms(layout)
 		_tag_special_rooms(layout)
 		_apply_theme(layout)
 		_stamp_templates(layout)
@@ -135,6 +147,24 @@ func _place_rooms(layout: DungeonLayout) -> void:
 	_add_loop_connections(layout, layout.rng.randi_range(1, 3))
 	layout.add_cell(centre, DungeonCell.Type.START)
 	layout.compute_depths()
+
+
+func _place_rooms_gungeon(layout: DungeonLayout) -> void:
+	## Day 5 — Gungeon-style pipeline. Builds multi-cell rooms via RoomShape +
+	## GungeonLayoutBuilder, then carves stub corridors with GungeonCorridorCarver.
+	## Side data is stashed on current_gungeon_data so the minimap can render
+	## multi-cell room groupings. The rest of the pipeline (tag / theme / stamp
+	## / populate / loot) still sees a normal DungeonLayout and behaves the same.
+	var builder := GungeonLayoutBuilder.new()
+	builder.target_rooms_min = rooms_per_era_min
+	builder.target_rooms_max = rooms_per_era_max
+	var data: Dictionary = builder.build(layout)
+	var carver := GungeonCorridorCarver.new()
+	carver.carve(layout, data)
+	current_gungeon_data = data
+	# The builder seeds layout.start_coord; make sure the START cell exists.
+	if not layout.cells.has(layout.start_coord):
+		layout.add_cell(layout.start_coord, DungeonCell.Type.START)
 
 
 func _collect_frontier(layout: DungeonLayout) -> Array[Vector2i]:
