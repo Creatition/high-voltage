@@ -51,6 +51,10 @@ func open(era: String = "any") -> void:
 	_offered = UpgradePool.roll(3, era, _min_tier_for_level())
 	_render()
 	visible = true
+	# Day-26 fix: nuke any in-flight Juice slow-mo / shake BEFORE pausing the
+	# tree, so picking an upgrade after taking damage can't leave the player in
+	# 5%-speed slow-mo + active screen shake when the picker closes.
+	_reset_juice()
 	get_tree().paused = true
 
 
@@ -70,6 +74,7 @@ func open_with(upgrades: Array) -> void:
 	_offered = upgrades.duplicate()
 	_render()
 	visible = true
+	_reset_juice()
 	get_tree().paused = true
 
 
@@ -175,5 +180,17 @@ func _on_reroll_pressed() -> void:
 func _close(picked_id: String) -> void:
 	visible = false
 	get_tree().paused = false
+	# Belt-and-suspenders: reset Juice on close too so the very first post-pick
+	# frame can't run at slow-mo speed with the camera offset still oscillating.
+	_reset_juice()
 	closed.emit(picked_id)
 	queue_free()
+
+
+func _reset_juice() -> void:
+	var juice := get_node_or_null("/root/Juice")
+	if juice != null and juice.has_method("reset_time_and_shake"):
+		juice.reset_time_and_shake()
+	else:
+		# Fallback if Juice autoload isn't present (e.g. test scenes).
+		Engine.time_scale = 1.0
