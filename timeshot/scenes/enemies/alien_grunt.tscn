@@ -1,0 +1,56 @@
+[gd_scene load_steps=8 format=3 uid="uid://timeshot_alien_grunt"]
+
+[ext_resource type="Script" path="res://scenes/enemies/alien_grunt.gd" id="1_grunt"]
+[ext_resource type="Script" path="res://scripts/components/health_component.gd" id="2_health"]
+[ext_resource type="Script" path="res://scripts/components/hurtbox_component.gd" id="3_hurt"]
+[ext_resource type="Script" path="res://scripts/components/hitbox_component.gd" id="4_hit"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_body"]
+size = Vector2(20, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurt"]
+size = Vector2(20, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_contact"]
+size = Vector2(24, 24)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_grunt"]
+size = Vector2(20, 20)
+
+[node name="AlienGrunt" type="CharacterBody2D"]
+collision_layer = 4
+collision_mask = 3
+script = ExtResource("1_grunt")
+currency_on_death = 3
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.5, 1, 0.45, 1)
+texture = SubResource("PlaceholderTexture2D_grunt")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("2_health")
+max_hp = 3
+invuln_after_hit = 0.04
+
+[node name="HurtboxComponent" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 32
+script = ExtResource("3_hurt")
+health_component_path = NodePath("../HealthComponent")
+team_id = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HurtboxComponent"]
+shape = SubResource("RectangleShape2D_hurt")
+
+[node name="ContactHitbox" type="Area2D" parent="."]
+collision_layer = 64
+collision_mask = 8
+script = ExtResource("4_hit")
+damage = 1
+owner_id = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ContactHitbox"]
+shape = SubResource("RectangleShape2D_contact")
