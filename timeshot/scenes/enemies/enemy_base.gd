@@ -4,6 +4,10 @@ class_name EnemyBase
 ## currency drop on kill. Subclasses add AI in _physics_process.
 
 @export var currency_on_death: int = 1
+## XP granted to the player on death. Day 23 — feeds the level-up system.
+## Defaults to currency_on_death * 2 if left at 0, so existing enemies "just
+## work" without touching every scene file.
+@export var xp_on_death: int = 0
 ## When non-zero, spawns this many TimeShard pickups instead of (or in
 ## addition to) the direct currency grant. Useful for bosses to leave a
 ## visible "loot pile."
@@ -55,6 +59,15 @@ func _flash() -> void:
 func _on_died() -> void:
 	if currency_on_death > 0:
 		GameState.add_currency(currency_on_death)
+	# XP grant: feeds the level-up system. Bosses can override `xp_on_death`
+	# in their .tscn (~15-25 for big kills) so a boss can fire a full level.
+	var xp_amount: int = xp_on_death
+	if xp_amount <= 0:
+		xp_amount = maxi(1, currency_on_death * 2)
+	if is_in_group("bosses"):
+		xp_amount = maxi(xp_amount, 15)
+	if GameState.has_method("add_xp"):
+		GameState.add_xp(xp_amount)
 	_spawn_shards()
 	# Bosses kick a bigger shake; regular mobs a small puff.
 	var juice := get_node_or_null("/root/Juice")

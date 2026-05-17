@@ -1,15 +1,18 @@
 extends CanvasLayer
 class_name HUD
-## In-run heads-up display. Shows hearts (HP), currency, and active upgrade pips.
-## Auto-binds to the first node in the "players" group when added to the tree.
-## Also shows a top-center BOSS HP bar when a node in the "bosses" group is alive.
+## In-run heads-up display. Shows hearts (HP), currency, level/XP, active
+## upgrade pips, and a boss HP bar when a boss is alive.
+## Also routes level-up events to the upgrade picker.
 
 const HEART_FULL := Color(0.95, 0.30, 0.35, 1.0)
 const HEART_EMPTY := Color(0.20, 0.20, 0.24, 1.0)
+const UPGRADE_PICKER_SCENE := preload("res://scenes/ui/upgrade_picker.tscn")
 
 @onready var _hearts_box: HBoxContainer = $Margin/Top/HeartsBox
 @onready var _currency_label: Label = $Margin/Top/CurrencyBox/CurrencyLabel
 @onready var _upgrades_box: HBoxContainer = $Margin/Bottom/UpgradesBox
+@onready var _level_label: Label = $Margin/Bottom/XPRow/LevelLabel
+@onready var _xp_bar: ProgressBar = $Margin/Bottom/XPRow/XPBar
 @onready var _boss_layer: CenterContainer = $BossBarLayer
 @onready var _boss_name: Label = $BossBarLayer/BossBox/BossName
 @onready var _boss_hp: ProgressBar = $BossBarLayer/BossBox/BossHP
@@ -19,12 +22,22 @@ var _health: HealthComponent = null
 var _boss: Node = null
 var _boss_health: HealthComponent = null
 
+# Level-up pickers stack: if two level-ups land in the same frame we open them
+# in sequence rather than dropping any of the picks.
+var _pending_level_pickers: int = 0
+var _picker_open: bool = false
+
 
 func _ready() -> void:
 	GameState.currency_changed.connect(_on_currency_changed)
 	GameState.upgrade_added.connect(_on_upgrade_added)
+	if GameState.has_signal("xp_changed"):
+		GameState.xp_changed.connect(_on_xp_changed)
+	if GameState.has_signal("leveled_up"):
+		GameState.leveled_up.connect(_on_leveled_up)
 	_currency_label.text = "$ %d" % GameState.run_currency
 	_rebuild_upgrades()
+	_refresh_xp()
 	# Defer player lookup so the scene has had a chance to fully spawn.
 	call_deferred("_bind_player")
 	# Watch for any boss entering or leaving the scene.
@@ -77,9 +90,67 @@ func _rebuild_upgrades() -> void:
 		var data := UpgradePool.get_by_id(upgrade_id)
 		var pip := Label.new()
 		pip.text = data.get("name", upgrade_id) if not data.is_empty() else upgrade_id
-		pip.add_theme_color_override("font_color", Color(1, 0.9, 0.4))
+		var tier := String(data.get("tier", "common")) if not data.is_empty() else "common"
+		pip.add_theme_color_override("font_color", _tier_color(tier))
 		pip.add_theme_font_size_override("font_size", 14)
 		_upgrades_box.add_child(pip)
+
+
+func _tier_color(tier: String) -> Color:
+	# Mirror the rarity palette used in upgrade_picker.gd so the pip color
+	# tells you at a glance which tier each equipped upgrade is.
+	match tier:
+		"common":    return Color(0.85, 0.85, 0.90)
+		"uncommon":  return Color(0.45, 0.95, 0.55)
+		"rare":      return Color(0.40, 0.70, 1.00)
+		"epic":      return Color(0.80, 0.45, 1.00)
+		"legendary": return Color(1.00, 0.75, 0.30)
+	return Color(1, 0.9, 0.4)
+
+
+# ---------------------------------------------------------------------------
+# Level / XP
+# ---------------------------------------------------------------------------
+
+func _refresh_xp() -> void:
+	if _level_label == null or _xp_bar == null:
+		return
+	_level_label.text = "Lv %d" % int(GameState.run_level)
+	_xp_bar.max_value = float(maxi(1, int(GameState.run_xp_to_next)))
+	_xp_bar.value = float(GameState.run_xp)
+
+
+func _on_xp_changed(_current: int, _to_next: int, _level: int) -> void:
+	_refresh_xp()
+
+
+func _on_leveled_up(_new_level: int) -> void:
+	_refresh_xp()
+	_pending_level_pickers += 1
+	_open_next_picker_if_idle()
+
+
+func _open_next_picker_if_idle() -> void:
+	if _picker_open or _pending_level_pickers <= 0:
+		return
+	_pending_level_pickers -= 1
+	_picker_open = true
+	var picker := UPGRADE_PICKER_SCENE.instantiate()
+	# Add at the scene-root level so the picker pauses the tree cleanly.
+	var scene_root := get_tree().current_scene
+	if scene_root != null:
+		scene_root.add_child(picker)
+	else:
+		add_child(picker)
+	picker.closed.connect(_on_picker_closed)
+	if picker.has_method("open"):
+		picker.open(GameState.current_era)
+
+
+func _on_picker_closed(_picked_id: String) -> void:
+	_picker_open = false
+	# If more level-ups stacked while one was open, chain them now.
+	call_deferred("_open_next_picker_if_idle")
 
 
 # ---------------------------------------------------------------------------

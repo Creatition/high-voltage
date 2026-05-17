@@ -255,60 +255,80 @@ func _apply_upgrades() -> void:
 
 
 func _apply_upgrade(upgrade_id: String) -> void:
+	# Day 23: values scaled back so stacking 4-5 upgrades is interesting, not
+	# game-breaking. See upgrade_pool.gd for the canonical descriptions.
 	match upgrade_id:
+		# --- fire rate ---
 		"fire_rate_1":
-			shoot_cooldown = maxf(0.04, shoot_cooldown * 0.7)
+			shoot_cooldown = maxf(0.04, shoot_cooldown * 0.82)   # +18%
 		"fire_rate_2":
-			shoot_cooldown = maxf(0.04, shoot_cooldown * 0.55)
+			shoot_cooldown = maxf(0.04, shoot_cooldown * 0.7)    # +30%
+		# --- spread ---
 		"shotgun_1":
 			_spread_extra_shots += 2
 		"shotgun_2":
 			_spread_extra_shots += 2
 			shoot_cooldown = shoot_cooldown * 1.10
+		# --- bouncing ---
 		"bouncing_1":
+			_projectile_bounces += 1
+		"bouncing_2":
 			_projectile_bounces += 2
+			_projectile_speed_mult *= 1.10
+		# --- homing ---
 		"homing_1":
-			_projectile_homing = maxf(_projectile_homing, 240.0)
-			shoot_cooldown = shoot_cooldown * 1.15
+			_projectile_homing = maxf(_projectile_homing, 180.0)
+			shoot_cooldown = shoot_cooldown * 1.20
 		"homing_2":
-			_projectile_homing = maxf(_projectile_homing, 480.0)
+			_projectile_homing = maxf(_projectile_homing, 320.0)
+		# --- explosive ---
 		"explosive_1":
 			_projectile_explosion = preload("res://scenes/projectiles/explosion.tscn")
 		"explosive_2":
 			_projectile_explosion = preload("res://scenes/projectiles/explosion.tscn")
 			_projectile_damage_bonus += 1
+		# --- pierce ---
 		"pierce_1":
 			_projectile_pierce += 1
 		"pierce_2":
-			_projectile_pierce += 3
+			_projectile_pierce += 2
+		# --- damage ---
 		"damage_1":
 			_projectile_damage_bonus += 1
 		"damage_2":
-			_projectile_damage_bonus += 3
+			_projectile_damage_bonus += 2
+		# --- projectile flight ---
 		"bullet_speed_1":
+			_projectile_speed_mult *= 1.15
+		"bullet_speed_2":
 			_projectile_speed_mult *= 1.25
 		"range_1":
-			_projectile_lifetime_mult *= 1.5
+			_projectile_lifetime_mult *= 1.30
+		# --- mobility ---
 		"move_speed_1":
-			move_speed *= 1.15
+			move_speed *= 1.08
 		"dodge_cooldown_1":
-			dodge_cooldown = maxf(0.15, dodge_cooldown * 0.7)
+			dodge_cooldown = maxf(0.15, dodge_cooldown * 0.80)
+		"iframes_1":
+			dodge_duration += 0.08
+		# --- defense ---
 		"max_hp_1":
 			if health != null:
-				health.max_hp += 2
+				health.max_hp += 1
 		"max_hp_2":
 			if health != null:
-				health.max_hp += 4
+				health.max_hp += 2
+		# --- crit ---
 		"crit_1":
-			_crit_chance = maxf(_crit_chance, 0.25)
+			_crit_chance = maxf(_crit_chance, 0.15)
 		"crit_2":
-			_crit_chance = maxf(_crit_chance, 0.5)
-			_crit_mult = maxf(_crit_mult, 2.5)
+			_crit_chance = maxf(_crit_chance, 0.30)
+			_crit_mult = maxf(_crit_mult, 2.25)
+		# --- curse / legendary ---
 		"glass_cannon":
-			# Pure damage at a survivability cost.
-			_projectile_damage_bonus += 4
+			_projectile_damage_bonus += 3
 			if health != null:
-				health.max_hp = maxi(2, health.max_hp - 2)
+				health.max_hp = maxi(2, health.max_hp - 1)
 
 
 func _on_damaged(_amount: int, _current: int, _max_value: int) -> void:

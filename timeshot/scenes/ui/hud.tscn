@@ -43,10 +43,29 @@ size_flags_horizontal = 8
 
 [node name="Minimap" parent="Margin/Top/MinimapBox" instance=ExtResource("3_mm")]
 
-[node name="Bottom" type="HBoxContainer" parent="Margin"]
+[node name="Bottom" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
 size_flags_vertical = 8
-alignment = 0
+alignment = 2
+theme_override_constants/separation = 6
+
+[node name="XPRow" type="HBoxContainer" parent="Margin/Bottom"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LevelLabel" type="Label" parent="Margin/Bottom/XPRow"]
+layout_mode = 2
+text = "Lv 1"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.9, 0.95, 1.0, 1)
+
+[node name="XPBar" type="ProgressBar" parent="Margin/Bottom/XPRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(380, 14)
+min_value = 0.0
+max_value = 12.0
+value = 0.0
+show_percentage = false
 
 [node name="UpgradesBox" type="HBoxContainer" parent="Margin/Bottom"]
 layout_mode = 2

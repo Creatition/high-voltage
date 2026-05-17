@@ -9,6 +9,15 @@ var run_currency: int = 0
 var run_upgrades: Array[String] = []      # ids of upgrades equipped on the Chrono-Pistol this run
 var current_character_id: String = "cas"
 
+# --- Character level (Day 23) ---
+# Enemies grant XP on death; hitting xp_to_next bumps the level and opens
+# the upgrade picker. Resets to 1 on end_run().
+var run_level: int = 1
+var run_xp: int = 0
+var run_xp_to_next: int = 12
+const XP_CURVE_BASE: int = 12
+const XP_CURVE_PER_LEVEL: int = 6  # next-level cost grows linearly per level
+
 # Dungeon flow: GameState owns the queue of room scenes for the current era.
 # Doors call next_room_path() when their next_scene_path is empty.
 var dungeon_queue: Array[String] = []
@@ -38,11 +47,39 @@ signal currency_changed(new_amount: int)
 signal upgrade_added(upgrade_id: String)
 signal run_ended(reason: String)
 signal era_changed(new_era: String)
+## XP changed (current_xp, xp_to_next, level). Fired whenever XP is granted.
+signal xp_changed(current: int, to_next: int, level: int)
+## Player crossed a level threshold. The HUD/UpgradeRouter listens and opens
+## the picker; one signal per level so a single big XP grant can stack picks.
+signal leveled_up(new_level: int)
 
 
 func add_currency(amount: int) -> void:
 	run_currency += amount
 	currency_changed.emit(run_currency)
+
+
+## Grants XP. Handles the case where a single grant crosses multiple level
+## thresholds by emitting `leveled_up` once per level gained.
+func add_xp(amount: int) -> void:
+	if amount <= 0:
+		return
+	run_xp += amount
+	var levels_gained: int = 0
+	while run_xp >= run_xp_to_next:
+		run_xp -= run_xp_to_next
+		run_level += 1
+		run_xp_to_next = XP_CURVE_BASE + XP_CURVE_PER_LEVEL * (run_level - 1)
+		levels_gained += 1
+	xp_changed.emit(run_xp, run_xp_to_next, run_level)
+	for _i in levels_gained:
+		leveled_up.emit(run_level)
+
+
+func _reset_level() -> void:
+	run_level = 1
+	run_xp = 0
+	run_xp_to_next = XP_CURVE_BASE
 
 
 func spend_currency(amount: int) -> bool:
@@ -71,6 +108,8 @@ func end_run(reason: String) -> void:
 	dungeon_index = 0
 	eras_picked.clear()
 	eras_completed.clear()
+	_reset_level()
+	xp_changed.emit(run_xp, run_xp_to_next, run_level)
 	run_ended.emit(reason)
 
 
@@ -82,6 +121,8 @@ func reset_run() -> void:
 	eras_picked.clear()
 	eras_completed.clear()
 	current_era = "present"
+	_reset_level()
+	xp_changed.emit(run_xp, run_xp_to_next, run_level)
 
 
 func mark_era_complete(era_id: String) -> void:

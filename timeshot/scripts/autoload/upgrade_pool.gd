@@ -7,14 +7,23 @@ extends Node
 #   id:          stable string used by Player._apply_upgrade() and saves
 #   name:        display name on cards / HUD pips
 #   description: short flavor + mechanical line shown on the upgrade card
-#   tier:        "common" | "rare" | "legendary" — drives weighting
+#   tier:        "common" | "uncommon" | "rare" | "epic" | "legendary"
+#                — drives weighting AND visual rarity styling in the picker
 #   tags:        category tags for filtering / synergy detection
 #   eras:        which eras this can drop in ("any" allows everywhere)
+#
+# Day 23 pass:
+#  - Numeric values trimmed ~30-50% across the board so stacking 4-5 upgrades
+#    is interesting, not game-breaking.
+#  - Added UNCOMMON + EPIC tiers; legendaries now genuinely rare.
+#  - Adjusted weights so a level-up pick of 3 cards usually surfaces 2-3
+#    commons / uncommons and only occasionally a rare-or-better.
 var pool: Array = [
+	# ===== COMMON =====
 	{
 		"id": "fire_rate_1",
 		"name": "Lightning Reflexes",
-		"description": "+30% fire rate.",
+		"description": "+18% fire rate.",
 		"tier": "common",
 		"tags": ["fire_rate"],
 		"eras": ["any"],
@@ -30,7 +39,7 @@ var pool: Array = [
 	{
 		"id": "bouncing_1",
 		"name": "Ricochet Rounds",
-		"description": "Bullets bounce off walls 2 times.",
+		"description": "Bullets bounce off walls once.",
 		"tier": "common",
 		"tags": ["bouncing"],
 		"eras": ["any"],
@@ -44,23 +53,6 @@ var pool: Array = [
 		"eras": ["any"],
 	},
 	{
-		"id": "homing_1",
-		"name": "Heat Seekers",
-		"description": "Bullets curve toward enemies. Slight fire-rate cost.",
-		"tier": "rare",
-		"tags": ["homing"],
-		"eras": ["any"],
-	},
-	{
-		"id": "explosive_1",
-		"name": "Boomstick",
-		"description": "Bullets explode on impact. Mind the splash.",
-		"tier": "rare",
-		"tags": ["explosive"],
-		"eras": ["any"],
-	},
-	# --- Damage / multiplier upgrades ---
-	{
 		"id": "damage_1",
 		"name": "Hollow Points",
 		"description": "+1 bullet damage.",
@@ -69,34 +61,9 @@ var pool: Array = [
 		"eras": ["any"],
 	},
 	{
-		"id": "damage_2",
-		"name": "Depleted Uranium",
-		"description": "+3 bullet damage.",
-		"tier": "legendary",
-		"tags": ["damage"],
-		"eras": ["any"],
-	},
-	{
-		"id": "crit_1",
-		"name": "Weak Spot Scanner",
-		"description": "25% chance for shots to crit (x2 damage).",
-		"tier": "rare",
-		"tags": ["crit", "damage"],
-		"eras": ["any"],
-	},
-	{
-		"id": "crit_2",
-		"name": "Surgical Sights",
-		"description": "50% crit chance, crits deal x2.5 damage.",
-		"tier": "legendary",
-		"tags": ["crit", "damage"],
-		"eras": ["any"],
-	},
-	# --- Projectile flight upgrades ---
-	{
 		"id": "bullet_speed_1",
 		"name": "Hot Loads",
-		"description": "+25% bullet speed.",
+		"description": "+15% bullet speed.",
 		"tier": "common",
 		"tags": ["bullet_speed"],
 		"eras": ["any"],
@@ -104,18 +71,75 @@ var pool: Array = [
 	{
 		"id": "range_1",
 		"name": "Long Barrel",
-		"description": "+50% bullet range.",
+		"description": "+30% bullet range.",
 		"tier": "common",
 		"tags": ["range"],
 		"eras": ["any"],
 	},
-	# --- Spread / fire-rate stacks ---
+	{
+		"id": "max_hp_1",
+		"name": "Field Rations",
+		"description": "+1 max HP and heal that much.",
+		"tier": "common",
+		"tags": ["health"],
+		"eras": ["any"],
+	},
+	{
+		"id": "move_speed_1",
+		"name": "Quickstep",
+		"description": "+8% movement speed.",
+		"tier": "common",
+		"tags": ["movement"],
+		"eras": ["any"],
+	},
+	# ===== UNCOMMON =====
 	{
 		"id": "fire_rate_2",
 		"name": "Trigger Discipline",
-		"description": "+45% fire rate.",
-		"tier": "rare",
+		"description": "+30% fire rate.",
+		"tier": "uncommon",
 		"tags": ["fire_rate"],
+		"eras": ["any"],
+	},
+	{
+		"id": "max_hp_2",
+		"name": "Combat Stims",
+		"description": "+2 max HP and heal that much.",
+		"tier": "uncommon",
+		"tags": ["health"],
+		"eras": ["any"],
+	},
+	{
+		"id": "bullet_speed_2",
+		"name": "Magnetic Rails",
+		"description": "+25% bullet speed.",
+		"tier": "uncommon",
+		"tags": ["bullet_speed"],
+		"eras": ["any"],
+	},
+	{
+		"id": "iframes_1",
+		"name": "Slipstream",
+		"description": "+0.08s dodge invulnerability.",
+		"tier": "uncommon",
+		"tags": ["movement", "dodge"],
+		"eras": ["any"],
+	},
+	{
+		"id": "dodge_cooldown_1",
+		"name": "Adrenaline",
+		"description": "-20% dodge cooldown.",
+		"tier": "uncommon",
+		"tags": ["movement", "dodge"],
+		"eras": ["any"],
+	},
+	# ===== RARE =====
+	{
+		"id": "homing_1",
+		"name": "Heat Seekers",
+		"description": "Bullets curve toward enemies. Slight fire-rate cost.",
+		"tier": "rare",
+		"tags": ["homing"],
 		"eras": ["any"],
 	},
 	{
@@ -127,13 +151,47 @@ var pool: Array = [
 		"eras": ["any"],
 	},
 	{
+		"id": "crit_1",
+		"name": "Weak Spot Scanner",
+		"description": "15% chance for shots to crit (x2 damage).",
+		"tier": "rare",
+		"tags": ["crit", "damage"],
+		"eras": ["any"],
+	},
+	{
+		"id": "bouncing_2",
+		"name": "Quantum Ricochet",
+		"description": "Bullets bounce 2 more times and gain +10% speed per bounce.",
+		"tier": "rare",
+		"tags": ["bouncing"],
+		"eras": ["any"],
+	},
+	# ===== EPIC =====
+	{
 		"id": "pierce_2",
 		"name": "Rail Gun Mod",
-		"description": "Bullets pierce 3 extra enemies.",
-		"tier": "rare",
+		"description": "Bullets pierce 2 extra enemies.",
+		"tier": "epic",
 		"tags": ["pierce"],
 		"eras": ["any"],
 	},
+	{
+		"id": "damage_2",
+		"name": "Depleted Uranium",
+		"description": "+2 bullet damage.",
+		"tier": "epic",
+		"tags": ["damage"],
+		"eras": ["any"],
+	},
+	{
+		"id": "explosive_1",
+		"name": "Boomstick",
+		"description": "Bullets explode on impact. Mind the splash.",
+		"tier": "epic",
+		"tags": ["explosive"],
+		"eras": ["any"],
+	},
+	# ===== LEGENDARY =====
 	{
 		"id": "homing_2",
 		"name": "Smart Munitions",
@@ -150,44 +208,18 @@ var pool: Array = [
 		"tags": ["explosive", "damage"],
 		"eras": ["any"],
 	},
-	# --- Defense / mobility upgrades ---
 	{
-		"id": "max_hp_1",
-		"name": "Field Rations",
-		"description": "+2 max HP and heal that much.",
-		"tier": "common",
-		"tags": ["health"],
+		"id": "crit_2",
+		"name": "Surgical Sights",
+		"description": "30% crit chance, crits deal x2.25 damage.",
+		"tier": "legendary",
+		"tags": ["crit", "damage"],
 		"eras": ["any"],
 	},
-	{
-		"id": "max_hp_2",
-		"name": "Combat Stims",
-		"description": "+4 max HP and heal that much.",
-		"tier": "rare",
-		"tags": ["health"],
-		"eras": ["any"],
-	},
-	{
-		"id": "move_speed_1",
-		"name": "Quickstep",
-		"description": "+15% movement speed.",
-		"tier": "common",
-		"tags": ["movement"],
-		"eras": ["any"],
-	},
-	{
-		"id": "dodge_cooldown_1",
-		"name": "Adrenaline",
-		"description": "-30% dodge cooldown.",
-		"tier": "rare",
-		"tags": ["movement", "dodge"],
-		"eras": ["any"],
-	},
-	# --- Curse-style legendary ---
 	{
 		"id": "glass_cannon",
 		"name": "Glass Cannon",
-		"description": "+4 bullet damage. -2 max HP.",
+		"description": "+3 bullet damage. -1 max HP.",
 		"tier": "legendary",
 		"tags": ["damage", "curse"],
 		"eras": ["any"],
@@ -195,17 +227,28 @@ var pool: Array = [
 ]
 
 const TIER_WEIGHTS := {
-	"common": 5,
-	"rare": 2,
+	"common": 16,
+	"uncommon": 9,
+	"rare": 4,
+	"epic": 2,
 	"legendary": 1,
 }
 
+const TIER_ORDER := ["common", "uncommon", "rare", "epic", "legendary"]
+
 
 ## Returns N unique random upgrades, optionally era-filtered.
-func roll(count: int = 3, era: String = "any") -> Array:
+## `min_tier` raises the floor (e.g. level 5+ might guarantee uncommon+).
+func roll(count: int = 3, era: String = "any", min_tier: String = "common") -> Array:
+	var min_idx: int = TIER_ORDER.find(min_tier)
+	if min_idx < 0:
+		min_idx = 0
 	var available := []
 	for upgrade in pool:
 		if not _era_allows(upgrade, era):
+			continue
+		var tier_idx: int = TIER_ORDER.find(String(upgrade.get("tier", "common")))
+		if tier_idx < min_idx:
 			continue
 		available.append(upgrade)
 	var picks: Array = []
@@ -217,13 +260,13 @@ func roll(count: int = 3, era: String = "any") -> Array:
 
 
 func _weighted_pick(items: Array) -> Dictionary:
-	var total := 0
+	var total: int = 0
 	for item in items:
-		total += TIER_WEIGHTS.get(item.get("tier", "common"), 1)
-	var roll_value := randi() % maxi(total, 1)
-	var cursor := 0
+		total += int(TIER_WEIGHTS.get(item.get("tier", "common"), 1))
+	var roll_value: int = randi() % maxi(total, 1)
+	var cursor: int = 0
 	for item in items:
-		cursor += TIER_WEIGHTS.get(item.get("tier", "common"), 1)
+		cursor += int(TIER_WEIGHTS.get(item.get("tier", "common"), 1))
 		if roll_value < cursor:
 			return item
 	return items.back()
