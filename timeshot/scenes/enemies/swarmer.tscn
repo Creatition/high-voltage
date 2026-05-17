@@ -23,6 +23,8 @@ currency_on_death = 1
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("5_sprite")
+hframes = 8
+frame = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_body")
