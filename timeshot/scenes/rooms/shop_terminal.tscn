@@ -1,0 +1,45 @@
+[gd_scene load_steps=4 format=3 uid="uid://timeshot_shop_terminal"]
+
+[ext_resource type="Script" path="res://scenes/rooms/shop_terminal.gd" id="1_term"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_term"]
+size = Vector2(56, 72)
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_term"]
+size = Vector2(40, 56)
+
+[node name="ShopTerminal" type="Area2D"]
+collision_layer = 128
+collision_mask = 8
+script = ExtResource("1_term")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+modulate = Color(0.45, 0.85, 1, 1)
+texture = SubResource("PlaceholderTexture2D_term")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_term")
+
+[node name="NameLabel" type="Label" parent="."]
+offset_left = -80.0
+offset_top = -64.0
+offset_right = 80.0
+offset_bottom = -42.0
+horizontal_alignment = 1
+text = "Upgrade"
+
+[node name="PriceLabel" type="Label" parent="."]
+offset_left = -50.0
+offset_top = -44.0
+offset_right = 50.0
+offset_bottom = -22.0
+horizontal_alignment = 1
+text = "$ 25"
+
+[node name="InteractLabel" type="Label" parent="."]
+offset_left = -64.0
+offset_top = 38.0
+offset_right = 64.0
+offset_bottom = 60.0
+horizontal_alignment = 1
+text = "[E] Buy"

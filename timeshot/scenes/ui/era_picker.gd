@@ -16,14 +16,20 @@ class_name EraPicker
 @onready var _row: HBoxContainer = $Center/VBox/Row
 @onready var _victory_panel: VBoxContainer = $Center/VBox/VictoryPanel
 @onready var _victory_button: Button = $Center/VBox/VictoryPanel/MenuBtn
+@onready var _shop_button: Button = $Center/VBox/ShopBtn
 
 
 func _ready() -> void:
 	_victory_button.pressed.connect(_on_victory_menu)
+	_shop_button.pressed.connect(_on_shop_pressed)
 	if GameState.is_run_complete():
 		_show_victory()
 	else:
 		_render_picker()
+
+
+func _on_shop_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/rooms/shop_room.tscn")
 
 
 func _render_picker() -> void:
@@ -111,6 +117,7 @@ func _show_victory() -> void:
 	for c in _row.get_children():
 		c.queue_free()
 	_victory_panel.visible = true
+	_shop_button.visible = false
 
 
 func _on_victory_menu() -> void:

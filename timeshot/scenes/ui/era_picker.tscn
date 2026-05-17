@@ -46,6 +46,11 @@ theme_override_colors/font_color = Color(0.75, 0.75, 0.82, 1)
 alignment = 1
 theme_override_constants/separation = 24
 
+[node name="ShopBtn" type="Button" parent="Center/VBox"]
+text = "Visit Time Shop (spend $ for upgrades)"
+custom_minimum_size = Vector2(420, 40)
+size_flags_horizontal = 4
+
 [node name="VictoryPanel" type="VBoxContainer" parent="Center/VBox"]
 visible = false
 alignment = 1
