@@ -139,6 +139,11 @@ func _dedupe(arr: Array[Vector2i]) -> Array[Vector2i]:
 	return out
 
 
+func _in_bounds(c: Vector2i, grid_size: Vector2i) -> bool:
+	## Returns true if coord `c` is inside the [0, grid_size) grid box.
+	return c.x >= 0 and c.y >= 0 and c.x < grid_size.x and c.y < grid_size.y
+
+
 func _carve_corridor(layout: DungeonLayout, leaf_a: Rect2i, leaf_b: Rect2i, room_coords: Array[Vector2i]) -> void:
 	var a: Vector2i = _closest_room_in_rect(room_coords, leaf_a, leaf_b.get_center())
 	var b: Vector2i = _closest_room_in_rect(room_coords, leaf_b, leaf_a.get_center())
