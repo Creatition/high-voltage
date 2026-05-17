@@ -30,12 +30,15 @@ const GUNGEON_DATA_VERSION: int = 1
 const ROOM_TEMPLATE_PREFIX: String = "groom"
 
 # Tunables. Mirrored from DungeonGenerator defaults so the builder can run
-# standalone in the smoke test without an autoload reference.
-@export var target_rooms_min: int = 8
-@export var target_rooms_max: int = 12
-@export var corridor_link_chance: float = 0.30   ## Per door: insert a 1-cell corridor gap instead of a shared wall
-@export var loop_link_chance: float = 0.35       ## After main growth, try to re-link some adjacent rooms for non-tree flow
-@export var max_place_attempts_per_room: int = 24
+# standalone in the smoke test without an autoload reference. Plain `var`
+# (not @export) because @export is only valid on Node/Resource — RefCounted
+# fails to parse if @export is present, which would prevent the class_name
+# from registering and break callers like DungeonGenerator._place_rooms_gungeon.
+var target_rooms_min: int = 8
+var target_rooms_max: int = 12
+var corridor_link_chance: float = 0.30   ## Per door: insert a 1-cell corridor gap instead of a shared wall
+var loop_link_chance: float = 0.35       ## After main growth, try to re-link some adjacent rooms for non-tree flow
+var max_place_attempts_per_room: int = 24
 
 
 func build(layout: DungeonLayout) -> Dictionary:
