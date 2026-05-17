@@ -1,12 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://timeshot_reward_shrine"]
 
 [ext_resource type="Script" path="res://scenes/rooms/reward_shrine.gd" id="1_shrine"]
+[ext_resource type="Texture2D" path="res://art/sprites/props/reward_shrine.png" id="2_sprite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_shrine"]
 size = Vector2(40, 40)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_shrine"]
-size = Vector2(32, 32)
 
 [node name="RewardShrine" type="Area2D"]
 collision_layer = 0
@@ -21,8 +19,9 @@ offset_bottom = 24.0
 color = Color(1, 0.75, 0.2, 0.3)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-modulate = Color(1, 0.85, 0.4, 1)
-texture = SubResource("PlaceholderTexture2D_shrine")
+texture = ExtResource("2_sprite")
+hframes = 4
+frame = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_shrine")

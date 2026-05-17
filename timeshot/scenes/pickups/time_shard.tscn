@@ -1,12 +1,10 @@
 [gd_scene load_steps=4 format=3 uid="uid://timeshot_time_shard"]
 
 [ext_resource type="Script" path="res://scenes/pickups/time_shard.gd" id="1_shard"]
+[ext_resource type="Texture2D" path="res://art/sprites/pickups/time_shard.png" id="2_sprite"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_pickup"]
 size = Vector2(16, 16)
-
-[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_shard"]
-size = Vector2(12, 12)
 
 [node name="TimeShard" type="Area2D"]
 collision_layer = 128
@@ -14,8 +12,9 @@ collision_mask = 8
 script = ExtResource("1_shard")
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
-modulate = Color(1, 0.85, 0.3, 1)
-texture = SubResource("PlaceholderTexture2D_shard")
+texture = ExtResource("2_sprite")
+hframes = 4
+frame = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("RectangleShape2D_pickup")
