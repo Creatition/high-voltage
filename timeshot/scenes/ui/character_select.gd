@@ -55,7 +55,7 @@ func _make_card(c: Dictionary) -> Control:
 	blurb.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	vbox.add_child(blurb)
 
-	var stats := c.get("stats", {})
+	var stats: Dictionary = c.get("stats", {})
 	var stat_line := Label.new()
 	stat_line.text = "HP %d  •  Spd %.0f" % [int(stats.get("max_hp", 5)), float(stats.get("move_speed", 220.0))]
 	stat_line.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8))

@@ -55,8 +55,9 @@ func _refresh() -> void:
 
 
 func _make_perm_card(u: Dictionary) -> Control:
-	var current = GameState.permanent_upgrades.get(u["key"], 0)
-	var maxed: bool = current >= u["max"]
+	var current: Variant = GameState.permanent_upgrades.get(u["key"], 0)
+	var u_max: Variant = u["max"]
+	var maxed: bool = current >= u_max
 	var row := HBoxContainer.new()
 	row.custom_minimum_size = Vector2(0, 70)
 	row.add_theme_constant_override("separation", 16)

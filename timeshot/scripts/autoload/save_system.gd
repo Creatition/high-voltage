@@ -46,17 +46,17 @@ func load_save() -> void:
 		return
 	var data: Dictionary = parsed
 	GameState.meta_currency = int(data.get("meta_currency", 0))
-	var chars = data.get("unlocked_characters", ["cas"])
+	var chars: Variant = data.get("unlocked_characters", ["cas"])
 	if chars is Array:
 		GameState.unlocked_characters.clear()
 		for c in chars:
 			GameState.unlocked_characters.append(String(c))
 		if not "cas" in GameState.unlocked_characters:
 			GameState.unlocked_characters.append("cas")
-	var perms = data.get("permanent_upgrades", {})
+	var perms: Variant = data.get("permanent_upgrades", {})
 	if perms is Dictionary:
-		for k in perms.keys():
-			GameState.permanent_upgrades[k] = perms[k]
+		for k in (perms as Dictionary).keys():
+			GameState.permanent_upgrades[k] = (perms as Dictionary)[k]
 
 
 ## Spend meta_currency for a permanent unlock. Returns true on success.
@@ -75,8 +75,8 @@ func unlock_character(character_id: String) -> void:
 	GameState.unlocked_characters.append(character_id)
 
 
-func bump_permanent(key: String, delta) -> void:
-	var current = GameState.permanent_upgrades.get(key, 0)
+func bump_permanent(key: String, delta: Variant) -> void:
+	var current: Variant = GameState.permanent_upgrades.get(key, 0)
 	if current is float or delta is float:
 		GameState.permanent_upgrades[key] = float(current) + float(delta)
 	else:
