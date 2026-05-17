@@ -113,12 +113,86 @@ The AI should:
 
 ## Character system
 
-The player can unlock and swap between multiple playable characters. Characters are **cosmetic at first, with potential for light gameplay variation** later (e.g., one character starts with +1 HP but -1 damage, another starts with a reroll token).
+The player can unlock and swap between multiple playable characters. All characters share the Chrono-Pistol upgrade system — no character-locked weapons. Differences are cosmetic plus a small starting-perk variation per character.
 
-- All characters share the Chrono-Pistol upgrade system — no character-locked weapons.
-- Unlock conditions: complete a full run with the previous character, beat specific bosses, find hidden NPCs, achieve specific milestones (clear an era without taking damage, etc.).
-- Skins can be era-themed (a cavewoman, a pharaoh, a gunslinger, a cyborg) — naturally feeds the time-travel motif.
-- Roster grows the game without bloating the systems work.
+### Cas — starter protagonist
+
+- **Role:** Late-shift courier delivering a package to a hidden lab. Walks in on the boss using the time machine for the first time. Just an ordinary person way over their head.
+- **Gender:** Neutral / player-determined via cosmetic options.
+- **Vibe:** Grounded, dry, reactive. Not a soldier, not a scientist — the everyday person you'd want narrating a disaster.
+- **Starting perk:** None. Cas is the baseline — full HP, basic Chrono-Pistol, no extra reroll tokens. The "balanced" character.
+- **Why Cas is the starter:** Open, projectable, doesn't impose tone on the AI banter. Players make Cas their own.
+
+### Unlockable roster
+
+Each character is unlocked by hitting a specific milestone. Each brings a small mechanical twist and their own backstory dialogue with JANUS.
+
+| Character | Vibe | Unlock | Starting perk |
+|---|---|---|---|
+| **Wren** | Cynical museum security guard | Complete a run with Cas | Starts with +1 reroll token at the shop |
+| **Rook** | Cocky small-time thief | Beat the Wild West boss | +10% currency from enemy kills |
+| **Echo** | Curious grad-student archivist | Beat the Egypt boss with no curse status taken | Shop items cost 10% less |
+| **Sable** | Edgy ex-con framed by the boss | Beat the game once with any character | Starts each run with one random upgrade already equipped |
+
+Future characters can be added as expansion content — era-themed (a cavewoman, a pharaoh's bodyguard, a gunslinger, a cyborg defector) — naturally feeds the time-travel motif and gives players a reason to keep replaying.
+
+## JANUS — the time machine AI
+
+The narrator. The hub companion. The voice that comments on your build, narrates your boss fights, and slowly drips lore over the course of the game.
+
+### Identity
+
+- **Name:** JANUS (Roman god of doors, beginnings, transitions, and time — the two-faced one).
+- **Implied origin:** Built into the time machine. Has been operational for an indeterminate, very long time. Has seen many "Cases" before. Has opinions.
+- **Voice direction:** British academic, dry as bones, weary but never cruel. Imagine GLaDOS without the malice — closer to Bastion's narrator crossed with Stephen Fry's audiobook reading voice. Slightly theatrical but never performative.
+
+### Character arc
+
+JANUS opens cold and professional. As the game progresses, the cracks show: dry warmth, the occasional unguarded moment, hints that it remembers things it shouldn't. Late-game reveal options (TBD):
+
+- JANUS has been through this loop before with other protagonists, all of whom failed.
+- JANUS knows who the boss is and has personal history with them.
+- JANUS *built* the time machine. Or was once a person. Or is the boss's sibling/creator/rival.
+
+Pick the reveal that best serves the final fight when we get there. For now, the surface character is enough to write to.
+
+### What JANUS does in-game
+
+- Narrates the player's gun build with dry commentary.
+- Reacts to the era the player picks next.
+- Drops lore breadcrumbs about the boss between rooms.
+- Reads incoming boss attacks aloud during fights ("Charging. Move.") — diegetic tutorialization.
+- Has a small pool of context-aware idle barks (low HP, full ammo, took curse damage, etc.).
+- Occasionally bickers with whichever character the player is using.
+
+### Sample lines (writing-voice anchors)
+
+Use these as the tonal North Star for future dialogue:
+
+**Tutorial / first time machine use:**
+> "Yes, hello. Try not to vomit on the console — it's older than your country."
+
+**Picking next era:**
+> "Egypt. Bold choice. The traps are quite educational, once they've stopped killing you."
+> "The Wild West. Try not to die in a saloon. It's so... *prosaic*."
+
+**Commenting on build:**
+> "Homing, explosive, and bouncing. I'm impressed. Also concerned. Mostly concerned."
+> "All damage, no defense. I see we've graduated from 'careful' to 'committed'."
+
+**During a boss fight:**
+> "It's posturing. Strike now."
+> "That was *deliberately* dramatic. I'd applaud if I had hands."
+
+**Idle in the hub:**
+> "Take your time. I have, generously, all of it."
+> "There's a button over there. Don't press it. I won't tell you why."
+
+**Cas/Player on low HP:**
+> "If you die here, I am genuinely going to be annoyed. Don't make me find a replacement."
+
+**Late-game hint of depth:**
+> "I've watched a thousand of you walk through that door. None of them looked as tired as you do right now. Good. Tired people pay attention."
 
 ## Multiplayer roadmap
 
