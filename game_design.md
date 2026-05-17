@@ -1,17 +1,17 @@
-# Chrono-Gungeon — Game Design Doc
+# Timeshot — Game Design Doc
 
-> Working title. Top-down bullet-hell roguelike with a time-travel chase.
+> Top-down bullet-hell roguelike with a time-travel chase. Solo dev, Godot 4, stylized pixel art.
 
 ## Elevator pitch
 
-You stumble onto a time machine in the present day, just as a thief — *the final boss* — uses it to escape into history. You chase them through five eras: **Prehistoric, Ancient Egypt, Wild West, Future, and back to the Present**. Each era is a Gungeon-style procedurally generated run with its own enemies, traps, weapons aesthetic, and mini-boss splinter of the final boss. The final fight takes place in a Present Day overwritten by the boss's meddling.
+You stumble onto a time machine in the present day, just as a thief — *the final boss* — uses it to escape into history. You chase them through five eras: **Prehistoric, Ancient Egypt, Wild West, Future, and back to the Present**. Each era is a Gungeon-style procedurally generated run with its own enemies, traps, and weapons aesthetic, and ends with a fight against an era-fused form of the boss who escapes deeper into time. The final fight takes place in a Present Day overwritten by the boss's meddling.
 
 ## Core pillars
 
 1. **One gun, infinite variations.** The player has a single signature weapon, the **Chrono-Pistol**, that evolves dramatically through Rounds-style modular upgrades.
 2. **Time as theme, not gimmick.** Each era is a self-contained mini-game with unique mechanics, but they all interlock through the chase narrative and the gun.
 3. **Player power persists, gear does not.** Money is spent on the *player*, not on disposable inventory. No hoarding.
-4. **The chase tells the story.** You confront a splinter of the boss at the end of every era. They escape. You follow. Each encounter reveals more of their plan.
+4. **The chase tells the story.** You confront an evolved form of the same boss at the end of every era. They escape, taking one of your upgrades with them. You follow. Each encounter reveals more of their plan.
 
 ## Era flow
 
@@ -59,9 +59,24 @@ Each era's shop offers upgrades flavored by its setting. Players who revisit era
 
 ## The boss & the chase
 
-The final boss is fractured across time. You fight a **splinter** at the end of each era — each splinter has powers stolen from that era (a T-Rex-riding boss in Prehistoric, a mummified boss in Egypt, a quick-draw outlaw boss in the Wild West, a cybernetic boss in the Future). The full boss reassembles in the Corrupted Present finale, wielding everything they stole.
+**One antagonist, evolving forms.** The boss is a single character fleeing through time. As they pass through each era, they fuse with that era's power and reappear at the end of the floor in a new form for you to fight:
 
-**Optional twist:** each splinter, on defeat, drops a unique upgrade card. The boss also *steals* one of your upgrades each time and uses it against you in the next era's mini-boss fight.
+- **Prehistoric:** fused with a T-Rex / apex predator — heavy melee bruiser with charge attacks.
+- **Ancient Egypt:** mummified pharaoh — summons scarab swarms, curses your gun mid-fight.
+- **Wild West:** outlaw gunslinger — quick-draw duels, ricochet bullet patterns.
+- **Future:** cybernetic — shielded, teleports, drone summons.
+- **Corrupted Present (finale):** their true form, a fusion of all four era-powers.
+
+Each form is mechanically distinct (different moveset, attack patterns, weak points) but it's clearly the same character — same voice, same banter, same goal. The chase is personal.
+
+### Stolen upgrades
+
+Each time you beat a mid-era form, the boss escapes and **steals one of your gun upgrades** as they go. They don't use it themselves yet — they're hoarding. In the **final fight**, the boss reassembles all four stolen upgrades into their own weapon and turns your own build against you.
+
+This means:
+- Each mid-era fight loses you one upgrade going into the next era (incentive to swap builds).
+- The final boss's loadout is a horror-mirror of your specific run — every player's final fight is different.
+- On defeat, each mid-era boss form also drops a unique era-themed upgrade card as compensation.
 
 ## Era-specific mechanics
 
@@ -97,15 +112,42 @@ These came up after the initial concept — keeping them here so they don't get 
 9. **Achievements tied to gun builds.** "Beat the game with a homing-shotgun build", "Beat the game with only explosive rounds", etc. Drives experimentation.
 10. **Visual identity rule.** Every era should be recognizable at a one-frame glance by silhouette and color palette alone. If two screenshots from different eras look interchangeable, the art direction has failed.
 
+## Tech stack
+
+**Engine: Godot 4.x.** Solo-dev friendly, the developer already has experience with it, free + open source with no revenue royalties. Best-in-class 2D performance. Comparable shipped titles in Godot include Brotato, Halls of Torment, Cassette Beasts, and Dome Keeper. GDScript covers the bulk of the project; drop into C# only for performance hotspots (large bullet pools, AOE collision) if profiling demands it. Steam Deck export is trivial.
+
+**Art style: stylized chunky pixel art, cartoony.** Reference look sits between Enter the Gungeon (bold outlines, expressive sprite work) and Brotato (exaggerated proportions, saturated palettes). Cult of the Lamb is another good cartoony pixel-art reference for mood.
+
+Why pixel art over vector for this project:
+- Solo-dev sustainable — frames-per-animation cost is bounded.
+- The "one gun, multiple era skins" system is cheap with pixel art — recoloring and small silhouette tweaks instead of redrawing each era's variant from scratch.
+- Reads "cartoony" without needing illustrator-grade hand-drawn assets.
+
+### Tooling
+
+| Purpose | Tool | Notes |
+|---|---|---|
+| Sprite art + animation | **Aseprite** | $20 one-time, industry standard for pixel art |
+| Level layout | **LDtk** or **Tiled** | Both free, both have Godot importers |
+| SFX | **ChipTone**, **sfxr/Bfxr** | Free, browser-based |
+| Music | **BeepBox**, **LMMS** | Free; BeepBox for chiptune-leaning, LMMS for fuller tracks |
+| Audio editing | **Audacity** | Free |
+| Version control | **Git + GitHub** | Already in use (Creatition/high-voltage) |
+
 ## Open questions
 
-- What's the actual title?
-- Does the player character have a name and backstory, or are they a blank slate?
+- Player character name + backstory, or blank-slate avatar?
 - Is the time machine itself a character (sentient AI, mysterious voice)?
 - What's the boss's motivation — chaos, power, vengeance, accident?
-- 2D pixel art, 2D vector, or low-poly 3D?
-- Engine: Godot, Unity, GameMaker, custom?
-- Solo project or team?
+- Pixel art resolution target: 32×32 sprites (Brotato chunky), 16×16 (Nuclear Throne tight), or 48×48 (Gungeon detailed)?
+
+## Decisions locked in (2026-05-17)
+
+- **Title:** Timeshot
+- **Engine:** Godot 4.x
+- **Art style:** stylized cartoony pixel art
+- **Team:** solo dev
+- **Boss design:** one antagonist, evolving era-fused forms, steals upgrades for final fight
 
 ---
 
