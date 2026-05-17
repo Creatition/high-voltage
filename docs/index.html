@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timeshot</title>
+  <style>
+    :root {
+      --ink: #111;
+      --muted: #666;
+      --accent: #1d4ed8;
+      --accent-hover: #1e40af;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      color: var(--ink);
+      font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 64px 24px 96px;
+    }
+    h1 {
+      font-size: 2.25rem;
+      margin: 0 0 0.25em;
+      letter-spacing: -0.01em;
+    }
+    .tagline {
+      color: var(--muted);
+      margin: 0 0 2.5em;
+      font-size: 1.05rem;
+    }
+    .download {
+      display: inline-block;
+      padding: 14px 28px;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+    .download:hover { background: var(--accent-hover); }
+    .meta {
+      margin-top: 1em;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin: 2.5em 0 0.6em;
+      letter-spacing: -0.01em;
+    }
+    p { margin: 0.6em 0; }
+    ul { padding-left: 1.2em; margin: 0.6em 0; }
+    li { margin: 0.25em 0; }
+    code {
+      background: #f3f4f6;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.92em;
+    }
+    footer {
+      margin-top: 4em;
+      padding-top: 1.5em;
+      border-top: 1px solid #eee;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Timeshot</h1>
+    <p class="tagline">A time-travel bullet-hell roguelike. Windows, early build.</p>
+
+    <a class="download" href="./Timeshot.zip">Download for Windows</a>
+    <div class="meta">~35 MB ZIP &middot; unzip and run <code>Timeshot.exe</code></div>
+
+    <h2>First-time setup</h2>
+    <ol>
+      <li>Download and unzip anywhere.</li>
+      <li>Run <code>Timeshot.exe</code>.</li>
+      <li>Windows SmartScreen may warn that the app is unrecognized &mdash; click <strong>More info</strong> then <strong>Run anyway</strong>. The build isn't code-signed yet.</li>
+    </ol>
+
+    <h2>Controls</h2>
+    <ul>
+      <li><strong>WASD</strong> &mdash; move</li>
+      <li><strong>Mouse</strong> &mdash; aim</li>
+      <li><strong>Left click</strong> &mdash; shoot</li>
+      <li><strong>Space</strong> &mdash; dodge</li>
+      <li><strong>Esc</strong> &mdash; pause</li>
+    </ul>
+
+    <h2>Feedback</h2>
+    <p>This is an early build. Bugs, weirdness, and missing features are expected. If something breaks or feels wrong, let me know.</p>
+
+    <footer>
+      Source: <a href="https://github.com/Creatition/high-voltage">github.com/Creatition/high-voltage</a>
+    </footer>
+  </main>
+</body>
+</html>
