@@ -4,6 +4,8 @@ class_name MainMenu
 
 @onready var _new_run: Button = $Center/VBox/NewRun
 @onready var _continue_run: Button = $Center/VBox/Continue
+@onready var _time_bank: Button = $Center/VBox/TimeBank
+@onready var _boss_rush: Button = $Center/VBox/BossRush
 @onready var _quit: Button = $Center/VBox/Quit
 @onready var _meta_label: Label = $Center/VBox/MetaLabel
 
@@ -11,6 +13,8 @@ class_name MainMenu
 func _ready() -> void:
 	_new_run.pressed.connect(_on_new_run)
 	_continue_run.pressed.connect(_on_continue)
+	_time_bank.pressed.connect(_on_time_bank)
+	_boss_rush.pressed.connect(_on_boss_rush)
 	_quit.pressed.connect(_on_quit)
 	_meta_label.text = "Banked credits: $%d" % GameState.meta_currency
 	# "Continue" only makes sense when there's an active dungeon queue.
@@ -19,9 +23,8 @@ func _ready() -> void:
 
 func _on_new_run() -> void:
 	GameState.reset_run()
-	# New flow: skip the static hub, go straight to the era picker so the
-	# player chooses their first of ERAS_PER_RUN eras.
-	get_tree().change_scene_to_file("res://scenes/ui/era_picker.tscn")
+	# Day 16: route through character select first.
+	get_tree().change_scene_to_file("res://scenes/ui/character_select.tscn")
 
 
 func _on_continue() -> void:
@@ -30,6 +33,25 @@ func _on_continue() -> void:
 		get_tree().change_scene_to_file(path)
 	else:
 		get_tree().change_scene_to_file("res://scenes/ui/era_picker.tscn")
+
+
+func _on_time_bank() -> void:
+	get_tree().change_scene_to_file("res://scenes/ui/meta_menu.tscn")
+
+
+func _on_boss_rush() -> void:
+	GameState.reset_run()
+	GameState.current_era = "boss_rush"
+	GameState.dungeon_queue = [
+		"res://scenes/rooms/present_boss.tscn",
+		"res://scenes/rooms/aztec_boss.tscn",
+		"res://scenes/rooms/medieval_boss.tscn",
+		"res://scenes/rooms/prehistoric_boss.tscn",
+		"res://scenes/rooms/cyberpunk_boss.tscn",
+		"res://scenes/rooms/alien_boss.tscn",
+	]
+	GameState.dungeon_index = 0
+	get_tree().change_scene_to_file(GameState.current_room_path())
 
 
 func _on_quit() -> void:

@@ -53,6 +53,14 @@ custom_minimum_size = Vector2(280, 44)
 text = "Continue Run"
 custom_minimum_size = Vector2(280, 44)
 
+[node name="TimeBank" type="Button" parent="Center/VBox"]
+text = "Time Bank"
+custom_minimum_size = Vector2(280, 44)
+
+[node name="BossRush" type="Button" parent="Center/VBox"]
+text = "Boss Rush"
+custom_minimum_size = Vector2(280, 44)
+
 [node name="Quit" type="Button" parent="Center/VBox"]
 text = "Quit"
 custom_minimum_size = Vector2(280, 44)
