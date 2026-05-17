@@ -113,6 +113,6 @@ position = Vector2(960, 360)
 
 [node name="Door" parent="." instance=ExtResource("6_door")]
 position = Vector2(1232, 360)
-next_scene_path = "res://scenes/hub/time_machine_hub.tscn"
+next_scene_path = "res://scenes/rooms/present_boss.tscn"
 
 [node name="HUD" parent="." instance=ExtResource("5_hud")]

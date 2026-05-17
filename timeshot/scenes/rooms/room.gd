@@ -11,6 +11,9 @@ class_name Room
 
 @export var room_id: String = ""
 @export var era: String = "present"
+## Flip to true on the final room of an era so clearing it marks the era as
+## completed in GameState (drives the era picker's "remaining" count).
+@export var is_boss_room: bool = false
 @export var clear_to_unlock_doors: bool = true
 @export var spawn_reward_on_clear: bool = true
 @export var reward_position: Vector2 = Vector2(640, 360)
@@ -100,6 +103,8 @@ func _on_room_clear() -> void:
 		shrine.era = era
 		add_child(shrine)
 		shrine.position = reward_position
+	if is_boss_room and GameState.has_method("mark_era_complete"):
+		GameState.mark_era_complete(era)
 	room_cleared.emit()
 
 

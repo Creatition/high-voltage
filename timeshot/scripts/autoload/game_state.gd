@@ -14,6 +14,11 @@ var current_character_id: String = "cas"
 var dungeon_queue: Array[String] = []
 var dungeon_index: int = 0
 
+# Run progression: the player picks one of two random eras, eras_per_run times.
+const ERAS_PER_RUN: int = 5
+var eras_picked: Array[String] = []           # ids in the order they were chosen
+var eras_completed: Array[String] = []        # ids whose final boss has been killed
+
 # --- Snapshots that survive end_run() so the post-run screen can show them ---
 var last_run_upgrades: Array[String] = []
 var last_run_currency: int = 0
@@ -64,6 +69,8 @@ func end_run(reason: String) -> void:
 	run_upgrades.clear()
 	dungeon_queue.clear()
 	dungeon_index = 0
+	eras_picked.clear()
+	eras_completed.clear()
 	run_ended.emit(reason)
 
 
@@ -72,13 +79,30 @@ func reset_run() -> void:
 	run_upgrades.clear()
 	dungeon_queue.clear()
 	dungeon_index = 0
+	eras_picked.clear()
+	eras_completed.clear()
 	current_era = "present"
+
+
+func mark_era_complete(era_id: String) -> void:
+	if era_id != "" and era_id not in eras_completed:
+		eras_completed.append(era_id)
+
+
+func picks_remaining() -> int:
+	return maxi(0, ERAS_PER_RUN - eras_picked.size())
+
+
+func is_run_complete() -> bool:
+	return eras_picked.size() >= ERAS_PER_RUN
 
 
 # --- Dungeon flow ---
 
 func start_era(era_id: String, room_paths: Array) -> void:
 	current_era = era_id
+	if era_id != "" and era_id not in eras_picked:
+		eras_picked.append(era_id)
 	dungeon_queue.clear()
 	for p in room_paths:
 		dungeon_queue.append(String(p))

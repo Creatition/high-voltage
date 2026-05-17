@@ -16,6 +16,7 @@ size = Vector2(16, 640)
 script = ExtResource("1_room")
 room_id = "present_boss"
 era = "present"
+is_boss_room = true
 reward_position = Vector2(640, 360)
 
 [node name="Floor" type="ColorRect" parent="."]
@@ -89,6 +90,6 @@ position = Vector2(960, 200)
 
 [node name="Door" parent="." instance=ExtResource("5_door")]
 position = Vector2(1232, 360)
-next_scene_path = "res://scenes/hub/time_machine_hub.tscn"
+next_scene_path = "res://scenes/ui/era_picker.tscn"
 
 [node name="HUD" parent="." instance=ExtResource("4_hud")]

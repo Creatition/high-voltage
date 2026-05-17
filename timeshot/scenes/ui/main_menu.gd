@@ -19,7 +19,9 @@ func _ready() -> void:
 
 func _on_new_run() -> void:
 	GameState.reset_run()
-	get_tree().change_scene_to_file("res://scenes/hub/time_machine_hub.tscn")
+	# New flow: skip the static hub, go straight to the era picker so the
+	# player chooses their first of ERAS_PER_RUN eras.
+	get_tree().change_scene_to_file("res://scenes/ui/era_picker.tscn")
 
 
 func _on_continue() -> void:
@@ -27,7 +29,7 @@ func _on_continue() -> void:
 	if path != "" and ResourceLoader.exists(path):
 		get_tree().change_scene_to_file(path)
 	else:
-		get_tree().change_scene_to_file("res://scenes/hub/time_machine_hub.tscn")
+		get_tree().change_scene_to_file("res://scenes/ui/era_picker.tscn")
 
 
 func _on_quit() -> void:
