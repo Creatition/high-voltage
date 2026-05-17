@@ -122,35 +122,45 @@ The player can unlock and swap between multiple playable characters. Characters 
 
 ## Multiplayer roadmap
 
-Multiplayer is a **post-v1 expansion**, not in the launch scope. Solo dev + multiplayer at launch is a project-killer; building it on a stable single-player foundation is the safe path.
+Two-phase approach. v1.0 ships with cooperative play that functions as online co-op via Steam's platform features. PvP is a post-launch addition.
 
-### Phase 1 — v1.0 launch: single-player only
-The campaign, all 5 eras, full gun system, narrating time machine, character roster. This alone is the bulk of the project. Ship this first.
+### Phase 1 — v1.0 launch: solo + local co-op + Remote Play Together
+- **Solo campaign:** full 5-era loop, gun system, narrator, character roster.
+- **Local couch co-op:** 2–4 players, same screen, controllers. No netcode written.
+- **Remote Play Together:** automatically enabled by Steam for local co-op games. Host runs the game, the host's screen is streamed to friends online, friend controller inputs are sent back. From the player's perspective this *is* online co-op.
+  - Only the host needs to own the game — strong marketing angle.
+  - Steam handles the streaming infrastructure. Zero work for the developer.
+  - Works for 2–4 players. Quality is bound by host's upload bandwidth.
+  - References that shipped with this approach as their "online co-op": Brotato, Cult of the Lamb, Streets of Rogue.
 
-### Phase 2 — v1.x: local co-op (couch)
-Same-screen co-op for 2–4 players with controllers. No netcode, minimal complexity. Strong Steam selling point. Reference: Brotato shipped this way.
+This means v1.0 has *functional* online co-op without me writing a single line of networking code. Cooperative latency is forgiving enough for Remote Play Together to feel native.
 
-### Phase 3 — v2.0: online co-op + PvP
-Both online modes use **GodotSteam** (Godot plugin wrapping Steamworks) for matchmaking, lobbies, and P2P networking. No dedicated servers needed → no ongoing infrastructure cost.
+### Phase 2 — v1.x post-launch: Showdown PvP mode
+A separate mode from the main menu. This phase introduces real networking because competitive PvP needs low, predictable latency that Remote Play Together cannot guarantee.
 
-**Online co-op campaign:** 2–4 players run the same campaign together. Loot and currency shared or instanced (design decision TBD).
-
-**PvP mode — "Time Trials" (Rounds-inspired):** A separate mode from the campaign menu.
-- 2–4 players, small symmetric arenas (one arena per era as the map pool).
+**Showdown — the Rounds-inspired PvP mode:**
+- 2–4 players, small symmetric arenas (one map per era as the rotating pool).
 - Last player standing wins the round.
 - Best-of-X format for the match.
-- **The Rounds-style hook:** after each round, the player(s) who lost get to pick from 3 random gun upgrade cards. Winners get nothing. This rubber-banding keeps matches close and competitive.
-- The Chrono-Pistol's upgrade system maps directly onto this — same cards, same logic, just a different game mode.
-- Cosmetic-only character roster carries over from the campaign.
+- **Rounds-style hook:** after each round, the player(s) who lost pick from 3 random gun upgrade cards. Winners get nothing. Built-in rubber-banding keeps matches close.
+- Chrono-Pistol's upgrade system maps directly — same cards, same logic, different mode.
+- Cosmetic character roster carries over from campaign.
 
-### Why GodotSteam over rolling your own server
-- Zero server cost (no ongoing infrastructure).
+**Networking stack for Showdown:**
+- **GodotSteam** plugin (https://godotsteam.com/) wraps Steamworks SDK for Godot 4.
 - Steam handles lobbies, matchmaking, friend invites, NAT punchthrough.
-- One platform target (Steam-only multiplayer is a fine trade for a solo dev — most indie games do this).
-- Godot 4's high-level MultiplayerAPI works on top of it cleanly.
+- P2P over Steam's relay network — no dedicated servers, no infrastructure cost.
+- Godot 4's high-level MultiplayerAPI sits on top.
+- Steam-only multiplayer is a fine trade for a solo dev; most indie multiplayer ships this way.
 
-### Why PvP as a separate mode, not integrated
-The campaign is procedural and asymmetric (different runs, different builds). PvP needs balance, symmetry, and low latency. They share the gun engine but want opposite design constraints. Treating them as separate modes lets each shine.
+### Why this sequencing is the right call
+- Local co-op + Remote Play Together = real online co-op on launch day, zero netcode debt.
+- All netcode investment is concentrated in **one mode** (Showdown) where latency actually matters.
+- Single-player and co-op share 95% of their code, so building one builds the other.
+- PvP can ship as a free or paid update later, depending on launch reception.
+
+### Possible future: true online co-op
+If post-launch demand for "true" online co-op (drop-in/drop-out, no host machine required) is high, the GodotSteam stack built for Showdown can be extended to support it in v2.x. Defer the decision until launch data tells us if it's needed.
 
 ## Additional ideas worth exploring
 
@@ -161,7 +171,7 @@ These came up after the initial concept — keeping them here so they don't get 
 3. **Recurring enemy archetypes.** The "brute" archetype recurs across eras — caveman → sphinx guard → gunslinger → riot cop → mech. Mastering an archetype carries skill across the whole game.
 4. **Hidden 6th era (NG+).** Unlock after beating the game once. Could be Atlantis, far-future apocalypse, or a true "outside time" void. Reveals the boss's true origin.
 5. **Daily run / seeded leaderboard.** Gungeon does this. Cheap to add, big retention boost.
-6. **Split-path co-op.** During online co-op, allow two players to pursue different eras simultaneously and meet at boss fights. Adds strategic choice but doubles design complexity — defer to v2.x.
+6. **Split-path co-op.** Two players pursue different eras simultaneously and meet at boss fights. Adds strategic choice but doubles design complexity — defer to a possible v2.x.
 7. **Boss reveals through a "field journal".** The player character keeps a log that fills in lore as you progress. Doubles as a tutorial reference for status effects/enemies.
 8. **Era-specific companion pets.** Each unlock-able after clearing that era — a baby raptor, a scarab swarm familiar, a robot dog, etc. Combat or utility role.
 9. **Achievements tied to gun builds.** "Beat the game with a homing-shotgun build", "Beat the game with only explosive rounds", etc. Drives experimentation.
@@ -217,7 +227,7 @@ Why pixel art over vector for this project:
 - **Boss design:** one antagonist with evolving era-fused forms; steals upgrades for final fight
 - **Narrator:** sarcastic AI voice of the time machine (Hades/Bastion-style)
 - **Character system:** unlockable swappable characters/skins, all sharing the Chrono-Pistol system
-- **Multiplayer roadmap:** v1.0 single-player → v1.x local co-op → v2.0 online co-op + PvP Rounds-style mode (via GodotSteam)
+- **Multiplayer roadmap:** v1.0 ships with solo + local couch co-op + Steam Remote Play Together (acts as online co-op). v1.x post-launch adds **Showdown** (PvP Rounds-style mode) with real netcode via GodotSteam.
 - **Time paradox mechanic:** confirmed, actions in one era ripple into others
 
 ---
