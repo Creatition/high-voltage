@@ -48,6 +48,13 @@ func _advance() -> void:
 	var audio := get_node_or_null("/root/AudioManager")
 	if audio != null and audio.has_method("play"):
 		audio.play("door", -6.0)
+	# Day-27: keep the procgen minimap in sync with the legacy room queue.
+	# If DungeonRunner is active, step its current_coord to a connected
+	# unvisited neighbour each time we cross a door, so the player's
+	# position on the minimap reveals room-by-room.
+	var runner := get_node_or_null("/root/DungeonRunner")
+	if runner != null and runner.active and runner.has_method("advance_legacy"):
+		runner.advance_legacy()
 	# Boss Rush: always step through GameState.dungeon_queue regardless of
 	# the door's hardcoded next_scene_path (so era boss rooms can be reused).
 	if GameState.current_era == "boss_rush" and GameState.has_method("next_room_path"):
@@ -55,7 +62,7 @@ func _advance() -> void:
 		if next != "" and ResourceLoader.exists(next):
 			get_tree().change_scene_to_file(next)
 			return
-		# Boss rush complete → run-end screen.
+		# Boss rush complete -> run-end screen.
 		GameState.end_run("victory")
 		get_tree().change_scene_to_file("res://scenes/ui/run_end.tscn")
 		return

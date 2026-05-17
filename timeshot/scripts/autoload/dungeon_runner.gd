@@ -65,7 +65,7 @@ func advance_through(direction: Vector2i) -> DungeonCell:
 	var next_cell: DungeonCell = layout.get_cell(next_coord)
 	if next_cell == null:
 		return null
-	# Skip corridors transparently — corridors are one-cell connectors with
+	# Skip corridors transparently - corridors are one-cell connectors with
 	# exactly two endpoints. Walk through them until we hit a room cell.
 	while next_cell != null and next_cell.type == DungeonCell.Type.CORRIDOR:
 		# pick the OTHER endpoint of the corridor (the one we didn't come from)
@@ -115,3 +115,54 @@ func advance_named(direction_name: String) -> DungeonCell:
 		"south", "down":  return advance_through(DungeonCell.DIR_SOUTH)
 		"west", "left":   return advance_through(DungeonCell.DIR_WEST)
 	return null
+
+
+## Day-27: walking through a door fires the legacy GameState.next_room_path()
+## but doesn't pick a direction, so we can't call advance_through. Instead,
+## step current_coord to ANY connected, not-yet-visited neighbour, preferring
+## non-corridor cells so the minimap reveals room-by-room. If everything is
+## already visited (player backtracking), pick any connected neighbour so
+## the player isn't stuck in place on the map.
+func advance_legacy() -> DungeonCell:
+	if not active or layout == null:
+		return null
+	var cur: DungeonCell = layout.get_cell(current_coord)
+	if cur == null:
+		return null
+	# First pass: prefer unvisited, non-corridor neighbours.
+	var fallback: DungeonCell = null
+	for d in cur.connections:
+		var nb_coord: Vector2i = current_coord + d
+		var nb: DungeonCell = layout.get_cell(nb_coord)
+		if nb == null:
+			continue
+		if nb.type == DungeonCell.Type.CORRIDOR:
+			# Walk through the corridor to its other endpoint.
+			var step_dir: Vector2i = d
+			var probe: DungeonCell = nb
+			while probe != null and probe.type == DungeonCell.Type.CORRIDOR:
+				var next_dir: Vector2i = step_dir
+				for dd in probe.connections:
+					if dd != -step_dir:
+						next_dir = dd
+						break
+				step_dir = next_dir
+				nb_coord = probe.coord + next_dir
+				probe = layout.get_cell(nb_coord)
+			if probe == null:
+				continue
+			nb = probe
+		if not visited.has(nb.coord):
+			current_coord = nb.coord
+			visited[current_coord] = true
+			nb.visited = true
+			room_entered.emit(current_coord)
+			return nb
+		if fallback == null:
+			fallback = nb
+	if fallback != null:
+		current_coord = fallback.coord
+		visited[current_coord] = true
+		fallback.visited = true
+		room_entered.emit(current_coord)
+	return fallback

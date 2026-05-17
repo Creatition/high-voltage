@@ -107,7 +107,19 @@ func _on_era_picked(era: Dictionary) -> void:
 		queue.append(p)
 	if queue.is_empty():
 		return
-	GameState.start_era(era.get("id", ""), queue)
+	var era_id: String = String(era.get("id", ""))
+	GameState.start_era(era_id, queue)
+	# Day-27 fix: also kick off the procgen pipeline so the minimap has a
+	# layout to draw. The legacy room queue still drives actual gameplay
+	# (until each era's rooms migrate to DungeonRunner.advance_through),
+	# but DungeonRunner.layout is now populated, which is what the
+	# gungeon_minimap.gd in hud.tscn reads.
+	var runner := get_node_or_null("/root/DungeonRunner")
+	if runner != null and runner.has_method("start_generated_era"):
+		# Deterministic seed per-era-per-pick so reloading shows the same
+		# layout, but each new pick yields a fresh dungeon.
+		var seed_value: int = (era_id.hash() ^ (GameState.eras_picked.size() * 7919)) & 0x7fffffff
+		runner.start_generated_era(era_id, seed_value)
 	get_tree().change_scene_to_file(queue[0])
 
 
