@@ -82,12 +82,21 @@ func get_move_vector() -> Vector2:
 
 ## Returns the current aim vector. Falls back to mouse aim relative to a node
 ## when the right stick is idle.
+##
+## IMPORTANT: `viewport.get_mouse_position()` returns *screen-space* coords,
+## but `from_position` is the player's *world-space* global_position. When the
+## camera scrolls or zooms (which it does once we're in a real dungeon) the
+## two coordinate spaces diverge and bullets drift away from the cursor.
+## We fix that by mapping the mouse through the inverse canvas transform so
+## both vectors live in world space.
 func get_aim_vector(from_position: Vector2, viewport: Viewport) -> Vector2:
 	var stick := Input.get_vector("aim_left", "aim_right", "aim_up", "aim_down")
 	if stick.length() > DEADZONE:
 		return stick.normalized()
-	var mouse_pos := viewport.get_mouse_position()
-	var direction := (mouse_pos - from_position)
+	var screen_mouse := viewport.get_mouse_position()
+	var canvas_xform := viewport.get_canvas_transform()
+	var world_mouse := canvas_xform.affine_inverse() * screen_mouse
+	var direction := world_mouse - from_position
 	if direction.length() < 1.0:
 		return Vector2.RIGHT
 	return direction.normalized()

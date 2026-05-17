@@ -87,46 +87,107 @@ func _sanity_check(layout: DungeonLayout) -> bool:
 # -------------------------------------------------------------------------
 
 func _place_rooms(layout: DungeonLayout) -> void:
-	## Hybrid: BSP picks N candidate room slots; a walker stitches them
-	## together with corridors and adds a couple of branch rooms.
+	## Enter-the-Gungeon style layout: every cell is a fully-walled room, and
+	## every connection is a *direct* door between two orthogonally adjacent
+	## rooms. No long carved corridor chains — the room graph IS the dungeon.
+	##
+	## Algorithm:
+	##  1. Drop the START room at the grid centre.
+	##  2. Grow outward by repeatedly picking a frontier cell (empty, adjacent
+	##     to a placed room) and connecting it to ONE existing neighbour. We
+	##     bias the pick toward cells with fewer placed neighbours so the
+	##     dungeon spreads out instead of clumping into a blob.
+	##  3. Sprinkle 1-3 extra adjacencies for non-linear flow (EtG-style loops
+	##     and shortcut doors).
+	##  4. Compute depths so the rest of the pipeline can tag boss / shop / etc.
 	var room_target: int = layout.rng.randi_range(rooms_per_era_min, rooms_per_era_max)
-	var bsp := BSPPartitioner.new(layout.rng)
-	bsp.partition(Rect2i(Vector2i.ZERO, layout.grid_size), bsp_max_depth)
-
-	var leaf_rooms: Array[Vector2i] = []
-	for leaf in bsp.leaves:
-		leaf_rooms.append(bsp.cell_in_leaf(leaf))
-	# Dedupe in case two leaves happen to pick the same cell.
-	leaf_rooms = _dedupe(leaf_rooms)
-	# Cap to the room budget — drop furthest leaves first if there are too many.
-	if leaf_rooms.size() > room_target:
-		var centre := layout.grid_size / 2
-		leaf_rooms.sort_custom(func(a, b): return a.distance_squared_to(centre) < b.distance_squared_to(centre))
-		leaf_rooms = leaf_rooms.slice(0, room_target)
-
-	# Drop the rooms into the grid.
-	for coord in leaf_rooms:
-		layout.add_cell(coord, DungeonCell.Type.NORMAL)
-	# Pick a START cell — the room closest to the grid centre is least likely
-	# to be near a corner and most likely to give the player room to learn.
 	var centre := layout.grid_size / 2
-	var start_room: Vector2i = leaf_rooms[0]
-	for coord in leaf_rooms:
-		if coord.distance_squared_to(centre) < start_room.distance_squared_to(centre):
-			start_room = coord
-	layout.start_coord = start_room
-	layout.add_cell(start_room, DungeonCell.Type.START)
+	layout.start_coord = centre
+	layout.add_cell(centre, DungeonCell.Type.NORMAL)
 
-	# Carve corridors. For every adjacency pair the BSP recorded, find the
-	# closest room in leaf A to the closest room in leaf B and L-bend
-	# between them, marking each step as a CORRIDOR cell.
-	for pair in bsp.connections:
-		_carve_corridor(layout, pair[0], pair[1], leaf_rooms)
+	var rooms_placed: int = 1
+	var safety: int = layout.grid_size.x * layout.grid_size.y + 4
+	while rooms_placed < room_target and safety > 0:
+		safety -= 1
+		var frontier: Array[Vector2i] = _collect_frontier(layout)
+		if frontier.is_empty():
+			break
+		# Sort by adjacent-room count ascending so we prefer "edge" frontier
+		# cells; then pick randomly from the top handful so the layout still
+		# feels organic.
+		frontier.sort_custom(func(a, b):
+			return _count_room_neighbours(layout, a) < _count_room_neighbours(layout, b)
+		)
+		var pool_size: int = mini(4, frontier.size())
+		var chosen: Vector2i = frontier[layout.rng.randi() % pool_size]
+		layout.add_cell(chosen, DungeonCell.Type.NORMAL)
+		# Wire the new room to exactly one existing neighbour (tree growth).
+		var dirs_with_room: Array[Vector2i] = []
+		for d in DungeonCell.DIRS:
+			var nb: DungeonCell = layout.cells.get(chosen + d, null)
+			if nb != null and nb.is_room():
+				dirs_with_room.append(d)
+		dirs_with_room.shuffle()
+		if not dirs_with_room.is_empty():
+			layout.connect_cells(chosen, chosen + dirs_with_room[0])
+		rooms_placed += 1
 
-	# If the BSP produced disjoint clusters, force-connect them with a
-	# manhattan corridor from the start to the nearest unreachable room.
-	_ensure_connected(layout, leaf_rooms)
+	_add_loop_connections(layout, layout.rng.randi_range(1, 3))
+	layout.add_cell(centre, DungeonCell.Type.START)
 	layout.compute_depths()
+
+
+func _collect_frontier(layout: DungeonLayout) -> Array[Vector2i]:
+	## Empty in-bounds cells with at least one placed-room neighbour.
+	var seen: Dictionary = {}
+	var out: Array[Vector2i] = []
+	for coord in layout.cells.keys():
+		for d in DungeonCell.DIRS:
+			var n: Vector2i = coord + d
+			if seen.has(n):
+				continue
+			if layout.cells.has(n):
+				continue
+			if not _in_bounds(n, layout.grid_size):
+				continue
+			seen[n] = true
+			out.append(n)
+	return out
+
+
+func _count_room_neighbours(layout: DungeonLayout, coord: Vector2i) -> int:
+	var n: int = 0
+	for d in DungeonCell.DIRS:
+		var nb: DungeonCell = layout.cells.get(coord + d, null)
+		if nb != null and nb.is_room():
+			n += 1
+	return n
+
+
+func _add_loop_connections(layout: DungeonLayout, count: int) -> void:
+	## Find room pairs that are orthogonally adjacent but currently not
+	## connected, and join them. Keeps the dungeon from being a pure tree
+	## so the player has shortcuts and alternate paths between rooms.
+	var added: int = 0
+	var coords: Array = layout.cells.keys()
+	coords.shuffle()
+	for coord in coords:
+		if added >= count:
+			return
+		var cell: DungeonCell = layout.cells.get(coord, null)
+		if cell == null or not cell.is_room():
+			continue
+		var dirs := DungeonCell.DIRS.duplicate()
+		dirs.shuffle()
+		for d in dirs:
+			var nb: DungeonCell = layout.cells.get(coord + d, null)
+			if nb == null or not nb.is_room():
+				continue
+			if cell.is_connected_to(d):
+				continue
+			layout.connect_cells(coord, nb.coord)
+			added += 1
+			break
 
 
 func _dedupe(arr: Array[Vector2i]) -> Array[Vector2i]:
@@ -243,7 +304,34 @@ func _place_boss(layout: DungeonLayout) -> DungeonCell:
 		return null
 	furthest.type = DungeonCell.Type.BOSS
 	layout.boss_coord = furthest.coord
+	# EtG-style: boss room has exactly one entrance so the arena is sealed.
+	_prune_to_single_connection(layout, furthest)
 	return furthest
+
+
+func _prune_to_single_connection(layout: DungeonLayout, room: DungeonCell) -> void:
+	if room.connections.size() <= 1:
+		return
+	# Pick the entry that leads back toward the start (shortest depth neighbour),
+	# drop the rest from both sides.
+	var keep: Vector2i = room.connections[0]
+	var best_depth: int = INF
+	for d in room.connections:
+		var nb: DungeonCell = layout.cells.get(room.coord + d, null)
+		if nb == null:
+			continue
+		if nb.depth >= 0 and nb.depth < best_depth:
+			best_depth = nb.depth
+			keep = d
+	var to_remove: Array[Vector2i] = []
+	for d in room.connections:
+		if d != keep:
+			to_remove.append(d)
+	for d in to_remove:
+		var nb2: DungeonCell = layout.cells.get(room.coord + d, null)
+		room.disconnect_from(d)
+		if nb2 != null:
+			nb2.disconnect_from(-d)
 
 
 func _place_shop_and_shrine(layout: DungeonLayout, boss: DungeonCell) -> void:

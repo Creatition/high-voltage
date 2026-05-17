@@ -24,13 +24,23 @@ var _shoot_cooldown_timer: float = 0.0
 var _aim_direction: Vector2 = Vector2.RIGHT
 
 # Upgrade-modified runtime values (set by _apply_upgrades).
+# Baselines are captured AFTER character + permanent overrides apply, so re-rolling
+# upgrades inside a run doesn't undo your character's innate stats.
 var _base_shoot_cooldown: float = 0.18
+var _base_move_speed: float = 220.0
+var _base_dodge_cooldown: float = 0.6
+var _base_max_hp: int = 0
 var _spread_extra_shots: int = 0       # extra side-shots; 0 = single bullet
 var _spread_arc_degrees: float = 18.0
 var _projectile_pierce: int = 0
 var _projectile_bounces: int = 0
 var _projectile_homing: float = 0.0
 var _projectile_explosion: PackedScene = null
+var _projectile_damage_bonus: int = 0
+var _projectile_speed_mult: float = 1.0
+var _projectile_lifetime_mult: float = 1.0
+var _crit_chance: float = 0.0
+var _crit_mult: float = 2.0
 
 
 func _ready() -> void:
@@ -41,7 +51,13 @@ func _ready() -> void:
 	if health != null:
 		health.died.connect(_on_died)
 		health.damaged.connect(_on_damaged)
+	# Snapshot baselines AFTER character + permanent overrides so re-applying
+	# run upgrades doesn't wipe out character-specific tuning.
 	_base_shoot_cooldown = shoot_cooldown
+	_base_move_speed = move_speed
+	_base_dodge_cooldown = dodge_cooldown
+	if health != null:
+		_base_max_hp = health.max_hp
 	_apply_upgrades()
 	# Listen for upgrades added mid-run so picking one in a shop refreshes the gun.
 	if GameState.has_signal("upgrade_added"):
@@ -180,37 +196,112 @@ func _spawn_projectile(direction: Vector2) -> void:
 		projectile.homing_strength = _projectile_homing
 	if "explosion_scene" in projectile:
 		projectile.explosion_scene = _projectile_explosion
+	if "speed" in projectile and _projectile_speed_mult != 1.0:
+		projectile.speed *= _projectile_speed_mult
+	if "lifetime" in projectile and _projectile_lifetime_mult != 1.0:
+		projectile.lifetime *= _projectile_lifetime_mult
+	# Damage bonus + crit roll: mutate the projectile's HitboxComponent.
+	var hit := _find_hitbox(projectile)
+	if hit != null:
+		var dmg: int = hit.damage + _projectile_damage_bonus
+		if _crit_chance > 0.0 and randf() < _crit_chance:
+			dmg = int(round(float(dmg) * _crit_mult))
+		hit.damage = dmg
 	if projectile.has_method("launch"):
 		projectile.launch(direction)
 
 
+func _find_hitbox(node: Node) -> HitboxComponent:
+	for c in node.get_children():
+		if c is HitboxComponent:
+			return c
+	return null
+
+
 func _apply_upgrades() -> void:
 	# Reset to baseline before re-applying everything in GameState.run_upgrades.
+	# We snapshot prev_max_hp so a new max_hp upgrade can heal you by the delta
+	# without fully restoring HP every time the upgrade list changes.
+	var prev_max_hp: int = 0
+	if health != null:
+		prev_max_hp = health.max_hp
+		health.max_hp = _base_max_hp
 	shoot_cooldown = _base_shoot_cooldown
+	move_speed = _base_move_speed
+	dodge_cooldown = _base_dodge_cooldown
 	_spread_extra_shots = 0
 	_projectile_pierce = 0
 	_projectile_bounces = 0
 	_projectile_homing = 0.0
 	_projectile_explosion = null
+	_projectile_damage_bonus = 0
+	_projectile_speed_mult = 1.0
+	_projectile_lifetime_mult = 1.0
+	_crit_chance = 0.0
+	_crit_mult = 2.0
 	for upgrade_id in GameState.run_upgrades:
 		_apply_upgrade(upgrade_id)
+	if health != null:
+		if health.max_hp > prev_max_hp:
+			health.current_hp += (health.max_hp - prev_max_hp)
+		health.current_hp = mini(health.current_hp, health.max_hp)
 
 
 func _apply_upgrade(upgrade_id: String) -> void:
 	match upgrade_id:
 		"fire_rate_1":
 			shoot_cooldown = maxf(0.04, shoot_cooldown * 0.7)
+		"fire_rate_2":
+			shoot_cooldown = maxf(0.04, shoot_cooldown * 0.55)
 		"shotgun_1":
 			_spread_extra_shots += 2
+		"shotgun_2":
+			_spread_extra_shots += 2
+			shoot_cooldown = shoot_cooldown * 1.10
 		"bouncing_1":
 			_projectile_bounces += 2
 		"homing_1":
 			_projectile_homing = maxf(_projectile_homing, 240.0)
 			shoot_cooldown = shoot_cooldown * 1.15
+		"homing_2":
+			_projectile_homing = maxf(_projectile_homing, 480.0)
 		"explosive_1":
 			_projectile_explosion = preload("res://scenes/projectiles/explosion.tscn")
+		"explosive_2":
+			_projectile_explosion = preload("res://scenes/projectiles/explosion.tscn")
+			_projectile_damage_bonus += 1
 		"pierce_1":
 			_projectile_pierce += 1
+		"pierce_2":
+			_projectile_pierce += 3
+		"damage_1":
+			_projectile_damage_bonus += 1
+		"damage_2":
+			_projectile_damage_bonus += 3
+		"bullet_speed_1":
+			_projectile_speed_mult *= 1.25
+		"range_1":
+			_projectile_lifetime_mult *= 1.5
+		"move_speed_1":
+			move_speed *= 1.15
+		"dodge_cooldown_1":
+			dodge_cooldown = maxf(0.15, dodge_cooldown * 0.7)
+		"max_hp_1":
+			if health != null:
+				health.max_hp += 2
+		"max_hp_2":
+			if health != null:
+				health.max_hp += 4
+		"crit_1":
+			_crit_chance = maxf(_crit_chance, 0.25)
+		"crit_2":
+			_crit_chance = maxf(_crit_chance, 0.5)
+			_crit_mult = maxf(_crit_mult, 2.5)
+		"glass_cannon":
+			# Pure damage at a survivability cost.
+			_projectile_damage_bonus += 4
+			if health != null:
+				health.max_hp = maxi(2, health.max_hp - 2)
 
 
 func _on_damaged(_amount: int, _current: int, _max_value: int) -> void:
