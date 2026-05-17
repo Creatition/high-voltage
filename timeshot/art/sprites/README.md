@@ -24,6 +24,7 @@ Animations are exported as **horizontal spritesheets** — slice them with `regi
 ```
 characters/  hero, rogue, gunslinger, scientist, knight, alien
              — each has _idle, _run, _dodge (4f each), _shoot (1f), _portrait (1f)
+             — each also has _hurt (1f) and _death (4f fall sheet)
              hero/gunslinger/scientist additionally have
              _idle_up/_run_up, _idle_down/_run_down, _idle_side/_run_side
 enemies/     Present:     drone, hacker, shooter, chaser,
@@ -43,19 +44,37 @@ enemies/     Present:     drone, hacker, shooter, chaser,
                (as _elite_idle, _elite_hurt, _elite_death)
 bosses/      present_miniboss, black_knight, trex,
              alien_mothership, ai_core, aztec_boss
-projectiles/ player_bullet, enemy_bullet, plasma_bolt, arrow, explosion
-pickups/     time_shard (4f), coin_gold/silver/copper, heart
+             — each has _idle + at least one action sheet
+             — each also has _phase2_<action> (enraged/corrupted recolor)
+projectiles/ player_bullet, enemy_bullet, plasma_bolt, plasma_orb, arrow,
+             fire_bullet, ice_bullet, sniper_bolt, shotgun_pellet,
+             bomb_bullet, grenade (4f spin), beam_charged,
+             laser_beam_seg (tileable) + laser_beam_head, explosion (7f)
+pickups/     time_shard (4f), heart, coin_gold/silver/copper,
+             key_red/blue/gold/skull, ammo_box, bomb_pickup (4f),
+             map_fragment, power_orb (4f),
+             currency_bone/gold/dollar/credit/scrap (era-specific tokens)
 tiles/       <era>_floor.png, <era>_wall.png, <era>_autotile.png (16-tile sheet)
              for present, medieval, prehistoric, cyberpunk, alien, aztec
+hazards/     lava, ice_floor, electric_floor, acid_pool, void_floor,
+             spider_web, spike_floor (all animated 4f, 16x16)
 weapons/     pistol_<era>.png — chrono-pistol skin per era
+weapon_mods/ scope, suppressor, magazine, laser_sight, silencer,
+             extended_barrel, explosive_rounds, freezing_rounds,
+             homing, piercing, burst, shotgun (16x16 icons)
 ui/          heart_full, heart_empty, upgrade_card_frame, button,
              crosshair, minimap_room, title_logo, menu_bg,
              card_<type> (fire/ice/shock/poison/speed/vitality/shield/power/multishot/boom),
              era_icon_<era>, bar_health_*, bar_xp_*, bar_dodge,
              ammo_dot_full/empty/reload, run_end_victory/defeat
-traps/       spike_pit, pressure_plate, dart_shooter
+portraits/   64x64 dialogue bust shots: hero, rogue, gunslinger,
+             scientist, knight, alien, antagonist, mechanic
+traps/       spike_pit, pressure_plate, dart_shooter,
+             flame_jet (4f), swinging_axe (4f pendulum),
+             falling_rock (4f), teleport_pad (4f)
 hub/         time_machine, portal_<era>
 props/       door_<kind>_<state>, chest_open/closed,
+             chest_wood/iron/gold/cursed open & closed,
              shop_terminal, reward_shrine, workbench
 npcs/        mechanic, shopkeeper, sage, outlaw, raptor_pet (idle sheets)
 vfx/         muzzle_flash (+_big), dodge_poof, hit_spark (+_ice/_plasma),
