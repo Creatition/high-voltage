@@ -4,7 +4,7 @@ class_name EnemyBase
 ## currency drop on kill. Subclasses add AI in _physics_process.
 
 @export var currency_on_death: int = 1
-## XP granted to the player on death. Day 23 — feeds the level-up system.
+## XP granted to the player on death. Day 23 - feeds the level-up system.
 ## Defaults to currency_on_death * 2 if left at 0, so existing enemies "just
 ## work" without touching every scene file.
 @export var xp_on_death: int = 0
