@@ -26,6 +26,19 @@ func _ready() -> void:
 		_show_victory()
 	else:
 		_render_picker()
+	# Day-28: focus first era card / victory button so gamepad works.
+	call_deferred("_grab_first_focus")
+
+
+func _grab_first_focus() -> void:
+	if _victory_panel != null and _victory_panel.visible and _victory_button != null:
+		_victory_button.grab_focus()
+		return
+	for c in _row.get_children():
+		if c is Button:
+			c.focus_mode = Control.FOCUS_ALL
+			c.grab_focus()
+			return
 
 
 func _on_shop_pressed() -> void:

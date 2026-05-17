@@ -1,5 +1,5 @@
 extends CharacterBody2D
-## Cas — the starter protagonist.
+## Cas - the starter protagonist.
 ## Top-down twin-stick movement with dodge roll, aim, and shoot.
 
 @export var move_speed: float = 185.0
@@ -72,7 +72,7 @@ func _ready() -> void:
 
 
 func _apply_character_overrides() -> void:
-	# CharacterRegistry is added as an autoload in Day 16 — guard so older
+	# CharacterRegistry is added as an autoload in Day 16 - guard so older
 	# saves / orphaned test scenes still load without it.
 	var reg := get_node_or_null("/root/CharacterRegistry")
 	if reg == null:
@@ -264,10 +264,13 @@ func _apply_upgrade(upgrade_id: String) -> void:
 		"fire_rate_2":
 			shoot_cooldown = maxf(0.04, shoot_cooldown * 0.7)    # +30%
 		# --- spread ---
+		# Day-28: cap extra shots at 6 total so stacking shotgun multiple times
+		# doesn't produce a screen-filling wall of bullets that trivialises
+		# every encounter.
 		"shotgun_1":
-			_spread_extra_shots += 2
+			_spread_extra_shots = mini(6, _spread_extra_shots + 2)
 		"shotgun_2":
-			_spread_extra_shots += 2
+			_spread_extra_shots = mini(6, _spread_extra_shots + 2)
 			shoot_cooldown = shoot_cooldown * 1.10
 		# --- bouncing ---
 		"bouncing_1":

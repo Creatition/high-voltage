@@ -14,9 +14,12 @@ var current_character_id: String = "cas"
 # the upgrade picker. Resets to 1 on end_run().
 var run_level: int = 1
 var run_xp: int = 0
-var run_xp_to_next: int = 12
-const XP_CURVE_BASE: int = 12
-const XP_CURVE_PER_LEVEL: int = 6  # next-level cost grows linearly per level
+var run_xp_to_next: int = 26
+# Day-28 balance: doubled the XP curve so a run sees ~3-4 picks instead of ~8-10.
+# Players reported upgrade stacks were "way too powerful" by mid-run; the fix
+# is fewer picks, not per-pick nerfs, so individual upgrades still feel impactful.
+const XP_CURVE_BASE: int = 26
+const XP_CURVE_PER_LEVEL: int = 14  # next-level cost grows linearly per level
 
 # Dungeon flow: GameState owns the queue of room scenes for the current era.
 # Doors call next_room_path() when their next_scene_path is empty.

@@ -19,6 +19,18 @@ func _ready() -> void:
 	_meta_label.text = "Banked credits: $%d" % GameState.meta_currency
 	# "Continue" only makes sense when there's an active dungeon queue.
 	_continue_run.disabled = GameState.current_room_path() == ""
+	# Day-28: grab focus on the first enabled button so gamepad / keyboard
+	# navigation works the instant the menu opens. Without this nothing has
+	# focus and pressing A/Enter/dpad does nothing.
+	call_deferred("_grab_first_focus")
+
+
+func _grab_first_focus() -> void:
+	for btn in [_new_run, _continue_run, _time_bank, _boss_rush, _quit]:
+		if btn != null and not btn.disabled:
+			btn.focus_mode = Control.FOCUS_ALL
+			btn.grab_focus()
+			return
 
 
 func _on_new_run() -> void:

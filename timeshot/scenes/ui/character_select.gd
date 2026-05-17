@@ -11,6 +11,19 @@ class_name CharacterSelect
 func _ready() -> void:
 	_back.pressed.connect(_on_back)
 	_render()
+	# Day-28: focus the first enabled character card so gamepad navigation
+	# works as soon as the screen loads.
+	call_deferred("_grab_first_focus")
+
+
+func _grab_first_focus() -> void:
+	for c in _row.get_children():
+		if c is Button and not (c as Button).disabled:
+			c.focus_mode = Control.FOCUS_ALL
+			c.grab_focus()
+			return
+	if _back != null:
+		_back.grab_focus()
 
 
 func _render() -> void:
@@ -25,6 +38,7 @@ func _make_card(c: Dictionary) -> Control:
 	var card := Button.new()
 	card.custom_minimum_size = Vector2(280, 360)
 	card.disabled = not unlocked
+	card.focus_mode = Control.FOCUS_ALL
 	card.pressed.connect(_on_pick.bind(c["id"]))
 
 	var vbox := VBoxContainer.new()
@@ -57,7 +71,7 @@ func _make_card(c: Dictionary) -> Control:
 
 	var stats: Dictionary = c.get("stats", {})
 	var stat_line := Label.new()
-	stat_line.text = "HP %d  •  Spd %.0f" % [int(stats.get("max_hp", 5)), float(stats.get("move_speed", 220.0))]
+	stat_line.text = "HP %d  -  Spd %.0f" % [int(stats.get("max_hp", 5)), float(stats.get("move_speed", 220.0))]
 	stat_line.add_theme_color_override("font_color", Color(0.7, 0.7, 0.8))
 	stat_line.add_theme_font_size_override("font_size", 14)
 	vbox.add_child(stat_line)
