@@ -26,12 +26,21 @@ characters/  hero, rogue, gunslinger, scientist, knight, alien
              — each has _idle, _run, _dodge (4f each), _shoot (1f), _portrait (1f)
              hero/gunslinger/scientist additionally have
              _idle_up/_run_up, _idle_down/_run_down, _idle_side/_run_side
-enemies/     drone, hacker, shooter, chaser (present)
-             knight, archer (medieval)
-             raptor, pterodactyl, caveman (prehistoric)
-             alien_grunt, alien_sentry (alien)
-             aztec_warrior (aztec)
+enemies/     Present:     drone, hacker, shooter, chaser,
+                          turret, mech, riot_drone, security_bot
+             Medieval:    knight, archer, mage, peasant_zombie, executioner
+             Prehistoric: raptor, pterodactyl, caveman,
+                          sabertooth, mammoth, dodo
+             Alien:       alien_grunt, alien_sentry,
+                          alien_brute, alien_psion, alien_scout
+             Aztec:       aztec_warrior, jaguar, shaman, mummy, eagle_warrior
+             Wild West:   bandit, sheriff, snake, dynamite_thrower
              dummy (training)
+             — every enemy has _idle + at least one action sheet (_walk/_run/_fire/_cast/etc.)
+             — every enemy has _hurt (1f white flash) and _death (4f fall sheet)
+             — elite palette-swap variants exist for drone, knight, raptor, alien_grunt,
+               aztec_warrior, chaser, shooter, hacker, mech, bandit
+               (as _elite_idle, _elite_hurt, _elite_death)
 bosses/      present_miniboss, black_knight, trex,
              alien_mothership, ai_core, aztec_boss
 projectiles/ player_bullet, enemy_bullet, plasma_bolt, arrow, explosion
