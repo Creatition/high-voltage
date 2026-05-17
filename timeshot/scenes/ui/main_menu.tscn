@@ -1,0 +1,64 @@
+[gd_scene load_steps=2 format=3 uid="uid://timeshot_main_menu"]
+
+[ext_resource type="Script" path="res://scenes/ui/main_menu.gd" id="1_menu"]
+
+[node name="MainMenu" type="Control"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.05, 0.06, 0.12, 1)
+
+[node name="Center" type="CenterContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="Center"]
+custom_minimum_size = Vector2(400, 0)
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="Title" type="Label" parent="Center/VBox"]
+text = "TIMESHOT"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 64
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+
+[node name="Subtitle" type="Label" parent="Center/VBox"]
+text = "a time-travel bullet-hell roguelike"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.7, 0.7, 0.78, 1)
+
+[node name="Spacer" type="Control" parent="Center/VBox"]
+custom_minimum_size = Vector2(0, 24)
+
+[node name="NewRun" type="Button" parent="Center/VBox"]
+text = "New Run"
+custom_minimum_size = Vector2(280, 44)
+
+[node name="Continue" type="Button" parent="Center/VBox"]
+text = "Continue Run"
+custom_minimum_size = Vector2(280, 44)
+
+[node name="Quit" type="Button" parent="Center/VBox"]
+text = "Quit"
+custom_minimum_size = Vector2(280, 44)
+
+[node name="MetaLabel" type="Label" parent="Center/VBox"]
+text = "Banked credits: $0"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
