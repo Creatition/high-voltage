@@ -35,6 +35,9 @@ var _projectile_explosion: PackedScene = null
 
 func _ready() -> void:
 	add_to_group("players")
+	_apply_character_overrides()
+	_apply_permanent_overrides()
+	_apply_starter_upgrade()
 	if health != null:
 		health.died.connect(_on_died)
 		health.damaged.connect(_on_damaged)
@@ -43,6 +46,54 @@ func _ready() -> void:
 	# Listen for upgrades added mid-run so picking one in a shop refreshes the gun.
 	if GameState.has_signal("upgrade_added"):
 		GameState.upgrade_added.connect(_on_upgrade_added)
+
+
+func _apply_character_overrides() -> void:
+	# CharacterRegistry is added as an autoload in Day 16 — guard so older
+	# saves / orphaned test scenes still load without it.
+	var reg := get_node_or_null("/root/CharacterRegistry")
+	if reg == null:
+		return
+	var data: Dictionary = reg.get_by_id(GameState.current_character_id)
+	if data.is_empty():
+		return
+	var stats: Dictionary = data.get("stats", {})
+	move_speed = float(stats.get("move_speed", move_speed))
+	dodge_cooldown = float(stats.get("dodge_cooldown", dodge_cooldown))
+	shoot_cooldown = float(stats.get("shoot_cooldown", shoot_cooldown))
+	if health != null:
+		var hp := int(stats.get("max_hp", health.max_hp))
+		health.max_hp = hp
+		health.current_hp = hp
+	# Tint the sprite to the character's color.
+	if sprite != null:
+		sprite.modulate = data.get("color", Color.WHITE)
+
+
+func _apply_permanent_overrides() -> void:
+	# Stack meta-progression bumps.
+	var hp_bonus := int(GameState.permanent_upgrades.get("max_hp_bonus", 0))
+	if hp_bonus > 0 and health != null:
+		health.max_hp += hp_bonus
+		health.current_hp += hp_bonus
+	var iframe_bonus := float(GameState.permanent_upgrades.get("dodge_iframe_bonus", 0.0))
+	if iframe_bonus > 0.0:
+		dodge_duration += iframe_bonus
+
+
+func _apply_starter_upgrade() -> void:
+	# If the character defines a starter upgrade and the player hasn't already
+	# taken it (e.g. they continued a run), add it once.
+	var reg := get_node_or_null("/root/CharacterRegistry")
+	if reg == null:
+		return
+	var data: Dictionary = reg.get_by_id(GameState.current_character_id)
+	var starter := String(data.get("starter_upgrade", ""))
+	if starter == "":
+		return
+	if starter in GameState.run_upgrades:
+		return
+	GameState.add_run_upgrade(starter)
 
 
 func _physics_process(delta: float) -> void:
@@ -102,6 +153,9 @@ func _shoot() -> void:
 	_shoot_cooldown_timer = shoot_cooldown
 	if projectile_scene == null:
 		return
+	var audio := get_node_or_null("/root/AudioManager")
+	if audio != null and audio.has_method("play"):
+		audio.play("shoot", -14.0)
 	var total_shots := 1 + _spread_extra_shots
 	var arc := deg_to_rad(_spread_arc_degrees) * float(_spread_extra_shots)
 	var start_angle := -arc * 0.5
@@ -160,8 +214,15 @@ func _apply_upgrade(upgrade_id: String) -> void:
 
 
 func _on_damaged(_amount: int, _current: int, _max_value: int) -> void:
-	# Hook for screen-shake / palette flash. No-op for the prototype.
-	pass
+	# Day 17: shake + hit-pause + flash on player damage.
+	var juice := get_node_or_null("/root/Juice")
+	if juice != null:
+		juice.shake(0.55)
+		juice.hit_pause(0.06, 0.05)
+		juice.flash_sprite(sprite, Color(2.0, 0.6, 0.6, 1.0), 0.10)
+	var audio := get_node_or_null("/root/AudioManager")
+	if audio != null and audio.has_method("play"):
+		audio.play("player_hurt", -4.0)
 
 
 func _on_upgrade_added(_upgrade_id: String) -> void:
