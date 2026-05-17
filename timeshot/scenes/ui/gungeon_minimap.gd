@@ -192,9 +192,33 @@ func _draw_per_cell(layout: DungeonLayout, current_coord: Vector2i) -> void:
 
 
 func _draw_legacy_placeholder() -> void:
-	## Nothing to draw — the old GraphMinimap handles that case. Leaving this
-	## blank keeps the widget invisible when stacked behind the legacy minimap.
-	pass
+	## Draws the linear "dungeon strip" used by eras that still feed the player
+	## through GameState.dungeon_queue (i.e. anything not migrated to procgen).
+	## Mirrors the dot-row look of the old minimap.tscn so swapping this widget
+	## into hud.tscn doesn't leave legacy eras with a blank minimap.
+	var gs := get_node_or_null("/root/GameState")
+	if gs == null:
+		return
+	var queue: Array = gs.dungeon_queue if "dungeon_queue" in gs else []
+	if queue.is_empty():
+		return
+	var idx: int = int(gs.dungeon_index) if "dungeon_index" in gs else 0
+	var dot: Vector2 = Vector2(maxf(8.0, cell_size.x * 0.75), maxf(8.0, cell_size.y * 0.75))
+	var gap: float = cell_gap.x + 4.0
+	for i in queue.size():
+		var pos: Vector2 = Vector2(i * (dot.x + gap), size.y * 0.5 - dot.y * 0.5)
+		var path_str: String = String(queue[i])
+		var is_boss: bool = path_str.find("boss") != -1
+		var col: Color
+		if i < idx:
+			col = visited_color
+		elif i == idx:
+			col = current_color
+		elif is_boss:
+			col = boss_color
+		else:
+			col = unvisited_color
+		draw_rect(Rect2(pos, dot), col, true)
 
 
 # -------------------------------------------------------------------------

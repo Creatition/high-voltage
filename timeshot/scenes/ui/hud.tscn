@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scenes/ui/hud.gd" id="1_hud"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="2_pause"]
-[ext_resource type="PackedScene" path="res://scenes/ui/minimap.tscn" id="3_mm"]
+[ext_resource type="Script" path="res://scenes/ui/gungeon_minimap.gd" id="3_mm"]
 
 [node name="HUD" type="CanvasLayer"]
 script = ExtResource("1_hud")
@@ -41,7 +41,9 @@ theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 layout_mode = 2
 size_flags_horizontal = 8
 
-[node name="Minimap" parent="Margin/Top/MinimapBox" instance=ExtResource("3_mm")]
+[node name="Minimap" type="Control" parent="Margin/Top/MinimapBox"]
+custom_minimum_size = Vector2(172, 172)
+script = ExtResource("3_mm")
 
 [node name="Bottom" type="VBoxContainer" parent="Margin"]
 layout_mode = 2
