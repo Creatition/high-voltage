@@ -27,6 +27,9 @@ InputManager="*res://scripts/autoload/input_manager.gd"
 AudioManager="*res://scripts/autoload/audio_manager.gd"
 UpgradePool="*res://scripts/autoload/upgrade_pool.gd"
 EraRegistry="*res://scripts/autoload/era_registry.gd"
+CharacterRegistry="*res://scripts/autoload/character_registry.gd"
+SaveSystem="*res://scripts/autoload/save_system.gd"
+Juice="*res://scripts/autoload/juice.gd"
 
 [display]
 
